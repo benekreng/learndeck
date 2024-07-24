@@ -11,6 +11,7 @@
   "dependencies": {
     "@expensify/react-native-live-markdown": "^0.1.108",
     "@expo/metro-runtime": "~3.2.1",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-navigation/native-stack": "^6.10.1",
     "expo": "~51.0.21",
     "expo-status-bar": "~1.12.1",

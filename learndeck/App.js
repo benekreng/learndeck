@@ -9,12 +9,30 @@ import Collapsible from 'react-native-collapsible';
 import Markdown from 'react-native-markdown-display';
 import PropTypes from 'prop-types';
 import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 const CardDeckBannerCell = forwardRef(({name, pressed}, ref) => {
+  //check
+  useEffect(() => {
+    (async () => {
+      try {
+        const value = await AsyncStorage.getItem('Unix');
+        if (value !== null) {
+          // We have data!!
+          //console.log('READ THIS DATA: ', value);
+        }
+      } catch (error) {
+        // Error retrieving data
+      }
+    })()
+  })
+
+
   const navigation = useNavigation();
   const [isOpened, setOpened] = useState(true);
+  
 
   useImperativeHandle(ref, () => ({
     changeLocalCollapseState
@@ -38,7 +56,7 @@ const CardDeckBannerCell = forwardRef(({name, pressed}, ref) => {
         </TouchableOpacity>
     </TouchableOpacity>
     <Collapsible collapsed={isOpened} duration={400} easing={'easeOutCubic'} style={{padding: 10}}>
-      <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 0, }}>
+      <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 0}}>
         <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: '50vh'}}>
           <Text style={{color: 'white', fontWeight: '400'}}>Choose Study Mode</Text>
         </View>
@@ -228,10 +246,20 @@ const CardDecksCollection =
   
 
 function CardDecks(){
+  const [cardDeckKeys, setCardDeckKeys] = useState([]);
   const numChildren = Object.entries(CardDecksCollection).length;
   const deckBannerRef = useRef([]);
   const scrollViewRef = useRef(null);
 
+  useEffect(() => {
+    (async () => {
+      const allKeys = await AsyncStorage.getAllKeys();
+      setCardDeckKeys(allKeys);
+    })()
+  },[])
+
+  console.log('THESE ARE THE CARD DECK KEYS', cardDeckKeys);
+  
   if (deckBannerRef.current.length !== numChildren) {
     deckBannerRef.current = Array(numChildren).fill().map((_, i) => deckBannerRef.current[i] || React.createRef());
   }
@@ -246,9 +274,21 @@ function CardDecks(){
     <ScrollView ref={scrollViewRef} style={{backgroundColor: 'beige'}}>
       <View style={{padding: 5}}>
       </View>
-      {Object.entries(CardDecksCollection).map(([key, value], idx)=>(
-        <CardDeckBannerCell name={key} pressed={handleCollapse} ref={deckBannerRef.current[idx]}/>
-      ))}
+      <>
+      { true ?  
+      // {cardDeckKeys !== undefined ? 
+        (
+        Object.entries(CardDecksCollection).map(([key, value], idx)=>(
+          <CardDeckBannerCell key={key} name={key} pressed={handleCollapse} ref={deckBannerRef.current[idx]}/>
+        ))
+      ):
+      (
+        <></>
+      )}
+      </>
+      {/* {cardDeckKeys.forEach((key)=>(
+        <CardDeckBannerCell key={key} name={key} pressed={handleCollapse} ref={deckBannerRef.current[idx]}/>
+      ))} */}
     </ScrollView>
   )
 }
@@ -271,7 +311,6 @@ const ButtonElement = ({name, style, textStyle, onPress, handleFeedback}) => {
   const navigation = useNavigation();
   const whenPressed = () => {
     onPress?.();
-    console.log('button has been clicked');
     handleFeedback?.(name);
   }
   return (
@@ -290,18 +329,36 @@ function EditScreen({name}) {
 }  
 
 
-
 const StudySession = ({route}) => {
+  //load from storage to memory to read and write the statistics
+  const { deck, studyMode } = route.params; 
+
   const navigation = useNavigation();
   const [isFlipped, setFlipped] = useState(false);
   const [currentCard, setNextCard] = useState(0);
+  const [lastCard, setLastCard] = useState(0);
+  const [deckJson, setDeckJson] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  const lastCard = CardDecksCollection[route.params.deck]['cards'].length - 1;
+  const [isLoading, setIsLoading] = useState(true);
 
-  console.log(route.params.studyMode)
-  console.log(route.params.deck)
-  console.log(currentCard)
+  useEffect(() => {
+    (async () => {
+      try {
+        const deckAsJson = await AsyncStorage.getItem(deck); 
+        setDeckJson(await JSON.parse(deckAsJson));
+      } catch (error) {
+        console.log('Failed to retrieve data from storage', error);
+      }
+    })();
+  }, []);
+  
+  useEffect(() => {
+    if (deckJson['cards'] != null && deckJson['cards'] != undefined) {
+      const lastCardIndex = deckJson['cards'].length-1;
+      setLastCard(lastCardIndex);
+    }
+  }, [deckJson]);
 
   const reloadStudySession = () => {
     setFlipped(false);
@@ -309,6 +366,7 @@ const StudySession = ({route}) => {
   }
 
   const handleFeedback = (feedback) => {
+    console.log('handeling feedback')
     if(currentCard < lastCard){
       setNextCard(currentCard + 1);
       setFlipped(false);
@@ -332,11 +390,16 @@ const StudySession = ({route}) => {
           !finished ? (
             <>
             <TouchableOpacity style={{flex: 2.5}} onPress={() => setFlipped(!isFlipped)}>
-              <FlashCard  deck={route.params.deck} cardNumber={currentCard} side={'front'}/>
+              <FlashCard deckJson={deckJson} cardNumber={currentCard} side={'front'}/>
             </TouchableOpacity>
 
             <View style={{flex: 2.5}}>
-                <FlashCard style={{display: isFlipped ? 'flex' : 'none'}} deck={route.params.deck} cardNumber={currentCard}  side={'back'}/>
+              {
+                isFlipped ? 
+                (<FlashCard deckJson={deckJson} cardNumber={currentCard}  side={'back'}/>)
+                :
+                (<></>)
+              }
             </View>
             </>
           ) : (
@@ -347,9 +410,15 @@ const StudySession = ({route}) => {
             <View style={{flex: 4.3, justifyContent: 'center'}}>
               <View style={{...styleElements.borderAndShadow, flex: 1, backgroundColor: 'lightgrey', margin: 20, marginTop: 5, borderRadius: '10px', justifyContent: 'space-around'}}>
                   <Text style={{...styles.midText02, alignSelf: 'center', padding: 10}}>This Session</Text>
-                  <Text numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText00, alignSelf: 'center', padding: 5, margin: 5, backgroundColor: '#419D78', borderRadius: '50'}}>Correct: 10</Text>
-                  <Text  numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText00, alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey'}}>Unsure: 5</Text>
-                  <Text  numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText00, alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'pink'}}>Wrong: 3</Text>
+                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: '#419D78', borderRadius: '50vh'}}>
+                    <Text style={{...styles.midText00}}> Correct: 10 </Text>
+                  </View>
+                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey', borderRadius: '50vh'}}>
+                    <Text style={{...styles.midText00}}>Unsure: 5</Text>
+                  </View>
+                  <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'pink', borderRadius: '50vh'}}>
+                    <Text style={{...styles.midText00}}>Wrong: 5</Text>
+                  </View>
                   <Text style={{alignSelf: 'center', padding: 10}}>All Sessions Graph</Text>
                   <View style={{backgroundColor: 'dimgrey', flex: 1, margin: 20, marginTop: 10}}></View>
               </View>
@@ -380,7 +449,41 @@ const StudySession = ({route}) => {
       }
       </SafeAreaView>
     )
-  }
+}
+
+const FlashCard = ({ deckJson, cardNumber, side}) => {
+  return (
+    <View style={{ ...styles.flashcardView }}>
+      <View style={styles.flashcardInnerView}>
+        <View style={styles.flashcardTextView}>
+          <Text>{deckJson?.['cards']?.[cardNumber]?.[side]}</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+// const FlashCard = ({ deckJson, cardNumber, side}) => {
+//   const [cardContent, setCardContent] = useState('');
+
+//   useEffect(() => {
+//     if(deckJson['cards'] == undefined){
+//       return;
+//     }
+//     setCardContent(deckJson['cards'][cardNumber][side])
+//   },[deckJson, cardNumber])
+
+//   return (
+//     <View style={{ ...styles.flashcardView }}>
+//       <View style={styles.flashcardInnerView}>
+//         <View style={styles.flashcardTextView}>
+//           <Text>{cardContent}</Text>
+//         </View>
+//       </View>
+//     </View>
+//   );
+// };
+
 
   const ProgressBar = ({currentCard, lastCard}) => {
     const [greenPart, setGreenPart] = useState(0);
@@ -392,8 +495,7 @@ const StudySession = ({route}) => {
       setProgress((currentCard).toString() + ' / ' + (lastCard+1).toString())
       setGreenPart(currentCard);
       setInvisiblePart(lastCard + 1 - currentCard);
-
-    }, [currentCard])
+    }, [currentCard, lastCard])
 
     return (
         <View style={{...styles.progressBarInnerView}}>
@@ -410,23 +512,47 @@ const StudySession = ({route}) => {
   }
 
 
-  const FlashCard = ({ style, deck, cardNumber, side}) => {
 
-    return (
-      <View style={{ ...styles.flashcardView, ...style }}>
-        <View style={styles.flashcardInnerView}>
-          <View style={styles.flashcardTextView}>
-            <Text>{CardDecksCollection[deck]['cards'][cardNumber][side]}</Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
 
 
 const Stack = createNativeStackNavigator();
 
+
 export default function App() {
+  const [firstLaunch, setFirstLaunch] = useState('false')
+  useEffect(() => {
+    //load the default decks from the hardcoded json object into the async storage if the app launched for the first time
+    (async () => { 
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        if(keys.length > 0){
+          setFirstLaunch('false')
+          console.log('App was already launched once')
+        }else{
+          setFirstLaunch('true')
+          console.log('App was launched the first time')
+        }
+      } catch (error) {
+        console.log('Failed to get all keys', error);
+      }
+    })();
+    if(firstLaunch){
+      (async () => {
+        for await (const [key, value] of Object.entries(CardDecksCollection)){
+          try {
+            await AsyncStorage.setItem(
+              key,
+              JSON.stringify(CardDecksCollection[key]) 
+            );
+          } catch (error) {
+            console.log('Failed to insert data', error);
+          }
+        }
+      })()
+    }
+  }, []);
+
+
   return (
     <NavigationContainer style={{}}>
       <Stack.Navigator screenOptions={{}}>
@@ -441,7 +567,7 @@ export default function App() {
             }
           })
           }/>
-        <Stack.Screen name="Study Session" component={StudySession} 
+        <Stack.Screen name="Study Session"  component={StudySession} 
         options={
           ({ route }) => ({ 
               studyMode: route.params.studyMode, 
