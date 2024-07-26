@@ -16,6 +16,7 @@ const CardDeckBannerCell = forwardRef(({name, pressed}, ref) => {
   useImperativeHandle(ref, () => ({
     changeLocalCollapseState
   }));
+
   const changeLocalCollapseState = (deck) => {
     if(deck == name){
       setOpened(!isOpened)

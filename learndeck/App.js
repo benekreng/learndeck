@@ -1,6 +1,5 @@
 // import DefaultCardDecksCollection from './assets/data/default_card_decks.json'
 
-
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, SafeAreaView, TextInput, Alert} from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
@@ -18,15 +17,8 @@ import StudySession from './components/StudySession'
 import ButtonElement from './components/buttonElement'
 import styles from './styles/mainStyles'
 import CardDecks from './components/cardDecks'
-
-
-function EditScreen({name}) {
-  //const deckName = route.params.lolman;
-  return (
-    <ScrollView style={{backgroundColor: 'beige'}}>
-    </ScrollView>
-  )
-}  
+import HomeScreen from './components/homeScreen'
+import EditScreen from './components/editScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -43,7 +35,6 @@ export default function App() {
         console.log("All the keys from the start> ", keys)
         if(keys.length === 0){
           for await (const [key, value] of Object.entries(DefaultCardDecksCollection)){
-            // console.log('YYYYY THE KEYS IS:  ', key, ' .  ', JSON.stringify(DefaultCardDecksCollection[key]))
             console.log('first launch')
             try {
               await AsyncStorage.setItem(
@@ -65,12 +56,12 @@ export default function App() {
     })();
   }, []);
 
-
   return (
     isLoading ? (<></>) : 
     (
     <NavigationContainer style={{}}>
       <Stack.Navigator screenOptions={{}}>
+        {/* <Stack.Screen name="Home" component={HomeScreen} options={{headerStyle: {backgroundColor: 'beige'}}} /> */}
         <Stack.Screen name="Card Deck's" component={CardDecks} options={{headerStyle: {
             backgroundColor: 'beige',
           },}}/>
