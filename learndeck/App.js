@@ -56,6 +56,7 @@ export default function App() {
     })();
   }, []);
 
+
   return (
     isLoading ? (<></>) : 
     (
@@ -69,7 +70,8 @@ export default function App() {
           ({ route }) => ({ 
               title: 'Edit Deck', 
               headerStyle: {
-              backgroundColor: 'beige'
+              backgroundColor: 'beige',
+              deck: route.params.deck, 
             }
           })
           }/>

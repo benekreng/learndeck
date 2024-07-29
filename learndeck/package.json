@@ -25,6 +25,7 @@
     "react-native-collapsible": "^1.6.1",
     "react-native-markdown-display": "^7.0.2",
     "react-native-paper": "^5.12.3",
+    "react-native-scroll-into-view": "^2.0.2",
     "react-native-tableview-simple": "^4.4.1",
     "react-native-web": "~0.19.10"
   },

@@ -31,7 +31,7 @@ const CardDeckBannerCell = forwardRef(({name, pressed}, ref) => {
         <View style={{justifyContent: 'center'}}>
           <Text style={styles.bigText}> {name} </Text>
         </View>
-        <TouchableOpacity style={styles.bannerEditButton} onPress={() => navigation.navigate('Edit Deck', {name: name})}>
+        <TouchableOpacity style={styles.bannerEditButton} onPress={() => navigation.navigate('Edit Deck', {deck: name})}>
           <Text>Edit</Text>
         </TouchableOpacity>
     </TouchableOpacity>
@@ -84,14 +84,28 @@ function CardDecks(){
   if(!isLoaded) return(<></>)
   return (
     <ScrollView ref={scrollViewRef} style={{backgroundColor: 'beige'}}>
-      <View style={{padding: 5}}>
-      </View>
-          {cardDeckKeys.map((key, idx) => 
-            (<CardDeckBannerCell key={key} name={key} pressed={handleCollapse} ref={deckBannerRef.current[idx]}/>)
-          )}
+      <View style={{padding: 5}}></View>
+        {cardDeckKeys.map((key, idx) => 
+          (<CardDeckBannerCell key={key} name={key} pressed={handleCollapse} ref={deckBannerRef.current[idx]}/>)
+        )}
     </ScrollView>
   )
 }
+
+const MyScrollView = () => {
+  const scrollViewRef = React.createRef();
+
+  const handleElementPress = (index) => {
+    const element = scrollViewRef.current.props.children[index];
+    scrollToElement(scrollViewRef.current, element);
+  };
+
+  return (
+    <ScrollView ref={scrollViewRef}>
+      {/* your elements here */}
+    </ScrollView>
+  );
+};
 
 //elment to click on to select study mode
 const StudyModeElement = ({studyMode, deck}) => {

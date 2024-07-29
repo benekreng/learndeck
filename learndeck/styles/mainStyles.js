@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   flashcardView: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,

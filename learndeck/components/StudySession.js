@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import {useState, useEffect} from 'react';
 import React from 'react';
 import Collapsible from 'react-native-collapsible';
-import Markdown from 'react-native-markdown-display';
 import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -29,13 +28,11 @@ const StudySession = ({route}) => {
     (async () => {
       try {
         const deckAsJson = await AsyncStorage.getItem(deck); 
-
         console.log('this json has been fetched from the database ', deckAsJson)
         const deckParsed = JSON.parse(deckAsJson);
         const lastCardIndex = deckParsed['cards'].length-1;
         setLastCard(lastCardIndex);
         setDeckJson(deckParsed);
-        
       } catch (error) {
         console.log('Failed to retrieve data from storage', error);
       }
@@ -211,7 +208,6 @@ const ProgressBar = ({currentCard, lastCard}) => {
 
   return (
       <View style={{...styles.progressBarInnerView}}>
-
         <View style={{flexDirection: 'row', flex: 1}}>
           <View style={{borderRadius: '50vh', flex: greenPart, backgroundColor: '#3d9470'}}></View>
           <View style={{borderRadius: '50vh', flex: invisiblePart, backgroundColor: 'transparent'}}></View>
@@ -247,7 +243,6 @@ const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
           {
           return(
             <View key={index} style={{flex: 1}}>
-              {/* <View style={{flex: 0.2, backgroundColor: 'invisible'}}></View> */}
               <View style={{flex: key[2], backgroundColor: '#3d9470', marginLeft: 2, marginRight: 2}}></View>
               <View style={{flex: key[1], backgroundColor: 'dimgrey', marginLeft: 2, marginRight: 2}}></View>
               <View style={{flex: key[0], backgroundColor: 'pink', marginLeft: 2, marginRight: 2}}></View>
@@ -281,26 +276,5 @@ const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
 //     </View>
 //   );
 // };
-
-const EditableMarkdownBox = () => {
-  const [markdownText, setMarkdownText] = useState('');
-
-  return (
-    <PaperProvider theme={MD3LightTheme}>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.textInput}
-          multiline
-          onChangeText={setMarkdownText}
-          value={markdownText}
-          placeholder="Type your markdown here..."
-        />
-        <ScrollView style={styles.markdownContainer}>
-          <Markdown>{markdownText}</Markdown>
-        </ScrollView>
-      </View>
-    </PaperProvider>
-  );
-};
 
 export default StudySession;
