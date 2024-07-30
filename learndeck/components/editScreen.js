@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, SafeAreaView, TextInput, Alert} from 'react-native';
+import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, TextInput, Alert} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import {useState,useRef, useImperativeHandle, forwardRef, useEffect} from 'react';
 import React from 'react';
@@ -11,15 +12,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import ButtonElement from './buttonElement'
+// import { styles, styleElements} from '../styles/mainStyles'
 import styles from '../styles/mainStyles'
 import { jsx } from 'react/jsx-runtime';
 
 const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJson, frontCardContent, backCardContent, cardNumber, side, additionalStyle, editButtonText="edit"}) => {
-	// const [cardContent, setCardContent] = useState(['', ''])
-	// useEffect(() => {
-	// 	setCardContent(deckJson)	
-	// }, [])
-
 	const [editMode, setEditMode] = useState(0);
 
 	const storeNewContent = (text, side) => {
@@ -48,10 +45,14 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 		refreshCallback();
 	}
 
-	const editButtonPress = (cardID, action=action) => {
+	const editButtonPress = (cardID, action) => {
 		setEditMode(cardID)
-		saveNewCardsToAsncStorage(deckJson)
-		console.log("Prompt to save Content", cardID)
+
+		//if the card id was 0 then the button has been pressed in save mode
+		if(cardID == 0){
+			saveNewCardsToAsncStorage(deckJson)
+			console.log("Prompt to save Content", cardID)
+		}
 	}
 
   return (
@@ -171,24 +172,66 @@ const EditScreen = ({route}) => {
 			try{
 				const serializedJson = JSON.stringify(newJson);
 				await AsyncStorage.setItem(deck, serializedJson);
-				console.log(serializedJson);
+				refresh();
 			}catch(err){
 				console.log("Could not save edited cards to async storage", err)
 			}
 	}
 
 	const refresh = () => {
-		setRefreshProp(refresh + 1);
+		setRefreshProp(refreshProp + 1);
+	}
+	
+	const addNewCard = async () => {
+		const newCard = {
+			"front": "Edit Front",
+			"back": "Edit Back",
+			"statistics": [0, 0, 0]
+		}
+		deckJson["cards"].unshift(newCard);
+		await saveNewCardsToAsncStorage(deckJson);
+		refresh();
+	}
+
+	const changeName = (newName) => {
+		console.log(deckJson)
+		console.log(newName)
 	}
 
 	if(!deckJson) return <></>
 	return(
-		<ScrollView key={refreshProp} style={{backgroundColor: 'beige'}}>
+		<>
+		<ScrollView key={refreshProp} style={{backgroundColor: 'beige', position: 'relative'}}>
+			{/* <Text style={{fontSize: 20, textAlign:'center', padding: 20}}>Name of Deck: </Text> */}
+			<View style={{alignItems: 'center', padding: 10}}>
+				<Text>Edit name:</Text>
+				<View style={{borderWidth: 2}}>
+					<TextInput onSubmitEditing={(event)=> {changeName(event.nativeEvent.text)}} style={{fontSize: 20, padding: 5}}>{deck}</TextInput>
+				</View>
+			</View>
 			{deckJson?.['cards'].map((card, index) => {
 				return(<BothMiniFlashCards key={index} deckJson={deckJson} cardNumber={index} refreshCallback={refresh} saveNewCardsToAsncStorage={saveNewCardsToAsncStorage}/>)
 				// return(<BothMiniFlashCards frontCardContent={card["front"]} backCardContent={card["back"]} deckJson={deckJson}/>)
 			})}
 		</ScrollView>
+		<View style={{flexDirection: 'row', flex: 1, position: 'absolute', bottom: 0, margin: 10}}>
+		<View style={{ flex: 6}}></View>
+			<TouchableOpacity onPress={addNewCard} style={{...styles.bannerEditButton, backgroundColor: '#3d9470', flex: 1, aspectRatio: 1/1, position: 'relative', borderRadius: '50vh', alignItems: 'center', justifyContent: 'center'}}>
+				<View style={{
+					width: '60%',
+					height: '10%',
+					backgroundColor: 'black',
+					position: 'absolute',
+				}} />
+				<View style={{
+					width: '10%',
+					height: '60%',
+					backgroundColor: 'black',
+					position: 'absolute',
+				}} />
+			</TouchableOpacity>
+		</View>
+		</>
 	) 
 }
 

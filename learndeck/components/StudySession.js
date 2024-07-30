@@ -1,5 +1,5 @@
 
-import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput} from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {useState, useEffect} from 'react';
 import React from 'react';
@@ -13,7 +13,7 @@ import styles from '../styles/mainStyles'
 
 const StudySession = ({route}) => {
   //load from storage to memory to read and write the statistics
-  const { deck, studyMode } = route.params; 
+  const { deck, studyMode } = route.params;
   const navigation = useNavigation();
 
   const [isFlipped, setFlipped] = useState(false);
@@ -31,6 +31,16 @@ const StudySession = ({route}) => {
         console.log('this json has been fetched from the database ', deckAsJson)
         const deckParsed = JSON.parse(deckAsJson);
         const lastCardIndex = deckParsed['cards'].length-1;
+        if(lastCardIndex == -1){
+          Alert.alert("You have no cards in this deck", "", [
+            {
+              text: 'Ok',
+              onPress: () => {
+                navigation.goBack()
+              }
+            }
+          ])
+        }
         setLastCard(lastCardIndex);
         setDeckJson(deckParsed);
       } catch (error) {
