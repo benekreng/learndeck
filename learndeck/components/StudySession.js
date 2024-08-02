@@ -13,7 +13,7 @@ import styles from '../styles/mainStyles'
 
 const StudySession = ({route}) => {
   //load from storage to memory to read and write the statistics
-  const { deck, studyMode } = route.params;
+  const { deck, studyMode, storageId} = route.params;
   const navigation = useNavigation();
 
   const [isFlipped, setFlipped] = useState(false);
@@ -27,7 +27,7 @@ const StudySession = ({route}) => {
   useEffect(() => {
     (async () => {
       try {
-        const deckAsJson = await AsyncStorage.getItem(deck); 
+        const deckAsJson = await AsyncStorage.getItem(storageId); 
         console.log('this json has been fetched from the database ', deckAsJson)
         const deckParsed = JSON.parse(deckAsJson);
         const lastCardIndex = deckParsed['cards'].length-1;
@@ -115,9 +115,9 @@ const StudySession = ({route}) => {
       (async () => {
           const jsonStringified = JSON.stringify(deckJson);
           console.log('this is the stringified json', jsonStringified);
-          await AsyncStorage.setItem(deck, JSON.stringify(deckJson));
+          await AsyncStorage.setItem(storageId, JSON.stringify(deckJson));
           console.log('hi there')
-          const theJson = await AsyncStorage.getItem(deck);
+          const theJson = await AsyncStorage.getItem(storageId);
           console.log("It should be correctl stored", theJson)
           console.log('bye')
         }

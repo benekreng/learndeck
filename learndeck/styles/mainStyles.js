@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink', 
     textAlign: 'center', 
     justifyContent: "center", 
-    padding: 20, 
+    alignItems: 'center',
+    padding: 20,
     borderRadius: '50vh', 
     borderWidth: 2, 
     aspectRatio: 1 / 1
@@ -142,7 +143,10 @@ const styles = StyleSheet.create({
 		marginTop: 5, 
 		borderRadius: '10px', 
 		justifyContent: 'space-around'
-	}
+	},
+  dailyGoalOuterView: {
+		...styleElements.borderAndShadow,
+  }
 });
 
 export default styles;

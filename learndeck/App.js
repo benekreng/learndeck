@@ -36,9 +36,10 @@ export default function App() {
         if(keys.length === 0){
           for await (const [key, value] of Object.entries(DefaultCardDecksCollection)){
             console.log('first launch')
+            storageId = "carddeck_" + key
             try {
               await AsyncStorage.setItem(
-                key,
+                storageId,
                 JSON.stringify(DefaultCardDecksCollection[key])
               );
             } catch (error) {
@@ -61,9 +62,9 @@ export default function App() {
     isLoading ? (<></>) : 
     (
     <NavigationContainer style={{}}>
-      <Stack.Navigator screenOptions={{}}>
-        {/* <Stack.Screen name="Home" component={HomeScreen} options={{headerStyle: {backgroundColor: 'beige'}}} /> */}
-        <Stack.Screen name="Card Deck's" component={CardDecks} options={{headerStyle: {
+      <Stack.Navigator screenOptions={{}} initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} options={{headerStyle: {backgroundColor: 'beige'}}} />
+        <Stack.Screen name="Card Decks" component={CardDecks} options={{headerStyle: {
             backgroundColor: 'beige',
           },}}/>
         <Stack.Screen name="Edit Deck" component={EditScreen} options={
@@ -71,7 +72,9 @@ export default function App() {
               title: 'Edit Deck', 
               headerStyle: {
               backgroundColor: 'beige',
-              deck: route.params.deck, 
+              deckName: route.params.deckName, 
+              deckStorageId: route.params.deckStorageId,
+              unmountOnBlur: true
             }
           })
           }/>
@@ -80,6 +83,7 @@ export default function App() {
           ({ route }) => ({ 
               studyMode: route.params.studyMode, 
               deck: route.params.deck, 
+              storageId: route.params.storageId, 
               headerStyle: {
               backgroundColor: 'beige'
             }

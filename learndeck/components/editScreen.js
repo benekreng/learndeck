@@ -110,6 +110,7 @@ const EditButton = ({name, editButtonStyle, callback, cardID, customStyle}) => {
 		}
 		callback(cardID);
 	}
+
 	return (
 		<TouchableOpacity style={{position: 'absolute', backgroundColor: 'pink', padding: 10, margin: 5, top: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
 			<Text numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText02}}> {name}</Text>
@@ -151,27 +152,131 @@ const EditableMarkdownBox = () => {
 
 
 const EditScreen = ({route}) => {
-	const { deck } = route.params;
+	const { deckName, deckStorageId, onGoBack} = route.params;
+	const [deck, setDeck] = useState(deckName);
+	const [storageId, setDeckStorageID] = useState(deckStorageId);
 	const navigation = useNavigation();
 	const [deckJson, setDeckJson] = useState();
 	const [refreshProp, setRefreshProp] = useState(0);
+	const [newName, setNewName] = useState(deck);
+	const [isLoaded, setIsLoaded] = useState(false);
+
+
+	const changeName = async () => {
+		if (newName === deck) {
+			return Promise.resolve("New name is the same as the old name. No change needed.");
+		}
+	
+		const oldKeyName = 'carddeck_' + deck;
+		const newKeyName = 'carddeck_' + newName;
+	
+		try {
+			console.log(newName, "submitted");
+	
+			const existingNewDeckJson = await AsyncStorage.getItem(newKeyName);
+			if (existingNewDeckJson !== null) {
+				throw new Error("A deck with the new name already exists.");
+			}
+	
+			const existingDeckJson = await AsyncStorage.getItem(oldKeyName);
+			if (existingDeckJson === null) {
+				return Promise.resolve("No existing deck found with the name: " + deck);
+			}
+	
+			await AsyncStorage.setItem(newKeyName, existingDeckJson);
+			await AsyncStorage.removeItem(oldKeyName);
+			setDeck(newName);
+			return Promise.resolve("Deck renamed successfully.");
+	
+		} catch (error) {
+			// return Promise.reject(error);
+			Alert.alert("Name already exist");
+		}
+	};
 
 	useEffect(() => {
-    (async () => {
-      try {
-        const deckAsJson = await AsyncStorage.getItem(deck); 
-        const deckParsed = JSON.parse(deckAsJson);
-        setDeckJson(deckParsed);
-      } catch (error) {
-        console.log('Failed to retrieve data from storage', error);
-      }
-    })();
+		if(deck == null){
+			//logic to create a new card deck form scratch if deck is null
+			(async () => {
+					const defaultDeckJson = {
+						"statistics": {
+							"errorsPerRun": []
+						},
+						"cards": [
+							{
+								"front": "Enter your question here",
+								"back": "Enter your answer here",
+								"statistics": [0, 0, 0]
+							}
+						]
+					}
+					setDeckJson(defaultDeckJson);
+					const allKeys = await AsyncStorage.getAllKeys();
+					const untitledList = allKeys.filter(item => item.toLowerCase().includes("untitled"));
+
+					const numbers = untitledList.map(item => {
+						const match = item.match(/untitled(\d+)/i);
+						return match ? parseInt(match[1]) : null;
+					}).filter(num => num !== null);
+					
+					const highestNumber = numbers.length > 0? Math.max(...numbers) + 1 : 0;
+					// const newUntitledName = 'untitled' + String(Number(highestNumber));
+					// const newUntitledStorageKey = 'carddeck_' + newUntitledName;
+					const newUntitledName = `untitled${highestNumber}`;
+					const newUntitledStorageKey = `carddeck_${newUntitledName}`;
+					setDeck(newUntitledName);
+					setNewName(newUntitledName);
+					setDeckStorageID(newUntitledStorageKey);
+					console.log(newUntitledStorageKey);
+					console.log(newUntitledName);
+					if(typeof newUntitledStorageKey !== "string"){
+						console.log("newUntitledStorageKey is not a string", newUntitledStorageKey)
+						return
+					}
+					try{
+						await AsyncStorage.setItem(newUntitledStorageKey, JSON.stringify(defaultDeckJson));
+					}catch(err){
+						console.log("failed to insert defaultDeckJson into async storage", err)
+					}
+					console.log("should have set is loaded to true")
+					setIsLoaded(true);
+					return;
+			})();
+		}else{
+			(async () => {
+				try {
+					const deckAsJson = await AsyncStorage.getItem(deckStorageId); 
+					const deckParsed = JSON.parse(deckAsJson);
+					setDeckJson(deckParsed);
+				} catch (error) {
+					console.log('Failed to retrieve data from storage', error);
+				}
+				setIsLoaded(true);
+			})();
+		}
   }, []);
+
+	// useEffect(() => {
+  //   const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+  //     // Prevent default behavior of leaving the screen
+  //     e.preventDefault();
+
+  //     // Run your function here
+	// 		if(newDeck == true && newName == null){
+	// 			Alert("You have to give the Deck a name");
+	// 			return
+	// 		}
+	// 		console.log("left but async was probably too slow ")
+
+  //     // Manually navigate to the next screen
+  //     navigation.dispatch(e.data.action);
+  //   });
+	// });
 
 	const saveNewCardsToAsncStorage = async (newJson) => {
 			try{
 				const serializedJson = JSON.stringify(newJson);
-				await AsyncStorage.setItem(deck, serializedJson);
+				await AsyncStorage.setItem(storageId, serializedJson);
 				refresh();
 			}catch(err){
 				console.log("Could not save edited cards to async storage", err)
@@ -183,6 +288,11 @@ const EditScreen = ({route}) => {
 	}
 	
 	const addNewCard = async () => {
+		// if(deck == null){
+		// 	Alert("You first have to choose a name");
+		// 	console.log("You first have to choose a name")
+		// 	return;
+		// }
 		const newCard = {
 			"front": "Edit Front",
 			"back": "Edit Back",
@@ -193,12 +303,9 @@ const EditScreen = ({route}) => {
 		refresh();
 	}
 
-	const changeName = (newName) => {
-		console.log(deckJson)
-		console.log(newName)
-	}
+	
 
-	if(!deckJson) return <></>
+	if(!deckJson || !isLoaded) return <Text>Loading: {String(!isLoaded)}</Text>
 	return(
 		<>
 		<ScrollView key={refreshProp} style={{backgroundColor: 'beige', position: 'relative'}}>
@@ -206,10 +313,10 @@ const EditScreen = ({route}) => {
 			<View style={{alignItems: 'center', padding: 10}}>
 				<Text>Edit name:</Text>
 				<View style={{borderWidth: 2}}>
-					<TextInput onSubmitEditing={(event)=> {changeName(event.nativeEvent.text)}} style={{fontSize: 20, padding: 5}}>{deck}</TextInput>
+					<TextInput returnKeyType="done" value={newName} onChangeText={setNewName} onSubmitEditing={changeName} style={{fontSize: 20, padding: 5}}></TextInput>
 				</View>
 			</View>
-			{deckJson?.['cards'].map((card, index) => {
+			{deckJson?.['cards']?.map((card, index) => {
 				return(<BothMiniFlashCards key={index} deckJson={deckJson} cardNumber={index} refreshCallback={refresh} saveNewCardsToAsncStorage={saveNewCardsToAsncStorage}/>)
 				// return(<BothMiniFlashCards frontCardContent={card["front"]} backCardContent={card["back"]} deckJson={deckJson}/>)
 			})}
