@@ -1,7 +1,7 @@
 
 import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import React from 'react';
 import Collapsible from 'react-native-collapsible';
 import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
@@ -10,8 +10,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
+import { ThemeContext } from '../styles/theme';
 
 const StudySession = ({route}) => {
+  const { theme, updateTheme } = useContext(ThemeContext);
   //load from storage to memory to read and write the statistics
   const { deck, studyMode, storageId} = route.params;
   const navigation = useNavigation();
@@ -23,6 +25,11 @@ const StudySession = ({route}) => {
   const [finished, setFinished] = useState(false);
   const [sessionScore, setSessionScore] = useState([0, 0, 0]);
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.primary },
+    });
+  }, [navigation, theme]);
 
   useEffect(() => {
     (async () => {
@@ -130,7 +137,7 @@ const StudySession = ({route}) => {
   }
 
   return (
-    <SafeAreaView style={{backgroundColor: 'beige', flex: 1, justifyContent: 'flex-end'}}>
+    <SafeAreaView style={{backgroundColor: theme.primary, flex: 1, justifyContent: 'flex-end'}}>
       <View style={{flex: 9}}>
         <View style={{flex: 0.8, justifyContent: 'center'}}>
           <Text numberOfLines={1} adjustsFontSizeToFit style={{fontSize: 30, fontWeight: 'bold', textAlign: 'center', alignSelf: 'center'}}>{route.params.deck}</Text>
@@ -163,13 +170,13 @@ const StudySession = ({route}) => {
               {/* box area to hold statistics */}
               <View style={{...styles.statisticsBox}}>
                   <Text style={{...styles.midText02, alignSelf: 'center', padding: 20}}>This Session</Text>
-                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: '#419D78', borderRadius: '50vh'}}>
+                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.positive, borderRadius: '50vh'}}>
                     <Text style={{...styles.midText00}}> Correct: {sessionScore[2]} </Text>
                   </View>
                   <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey', borderRadius: '50vh'}}>
                     <Text style={{...styles.midText00}}>Unsure: {sessionScore[1]}</Text>
                   </View>
-                  <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'pink', borderRadius: '50vh'}}>
+                  <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.negative, borderRadius: '50vh'}}>
                     <Text style={{...styles.midText00}}>Wrong: {sessionScore[0]}</Text>
                   </View>
                   <Text style={{alignSelf: 'center', padding: 20, paddingBottom: 0}}>All Sessions Graph</Text>
@@ -181,22 +188,26 @@ const StudySession = ({route}) => {
           }
         </View>
         {
+          //to displayed when not training, not finished
         !finished ? (
           <View style={{flex: 1, padding: 10}}>
             <Collapsible collapsed={!isFlipped} duration={400} easing={'easeOutCubic'} >
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <ButtonElement name="Wrong" style={{backgroundColor: '#ffb6c1', flex: 1}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
+                <ButtonElement name="Wrong" style={{backgroundColor: theme.negative, flex: 1}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
                 <ButtonElement name="Unsure" textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
-                <ButtonElement name="Correct" style={{backgroundColor: '#419D78'}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
+                <ButtonElement name="Correct" style={{backgroundColor: theme.positive}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
               </View>
             </Collapsible>
-            <ButtonElement name="FLIP" style={{display: !isFlipped ? 'flex' : 'none', ...styles.transition}} textStyle={{...styles.bigText}}onPress={()=> setFlipped(!isFlipped)}/>
+            {!isFlipped ? (
+            <ButtonElement name="FLIP" style={{backgroundColor: theme.neutral}} textStyle={{...styles.bigText}}onPress={()=> setFlipped(!isFlipped)}/>
+            ):
+            (<></>)}
           </View>
 
         ) : (
           <View style={{flex: 1, padding: 10, flexDirection: 'row'}}>
-            <ButtonElement name="Repeat" style={{...styles.transition, backgroundColor: '#ffb6c1'}} textStyle={{...styles.bigText}}onPress={()=> {setNextCard(0);reloadStudySession()}}/>
-            <ButtonElement name="Finish" style={{...styles.transition, backgroundColor: '#419D78'}} textStyle={{...styles.bigText}}onPress={()=> navigation.goBack()}/>
+            <ButtonElement name="Repeat" style={{...styles.transition, backgroundColor: theme.negative}} textStyle={{...styles.bigText}}onPress={()=> {setNextCard(0);reloadStudySession()}}/>
+            <ButtonElement name="Finish" style={{...styles.transition, backgroundColor: theme.positive}} textStyle={{...styles.bigText}}onPress={()=> navigation.goBack()}/>
           </View>
         )
       }
@@ -205,6 +216,7 @@ const StudySession = ({route}) => {
 }
 
 const ProgressBar = ({currentCard, lastCard}) => {
+  const { theme, updateTheme } = useContext(ThemeContext);
   const [greenPart, setGreenPart] = useState(0);
   const [invisiblePart, setInvisiblePart] = useState(lastCard);
 
@@ -219,7 +231,7 @@ const ProgressBar = ({currentCard, lastCard}) => {
   return (
       <View style={{...styles.progressBarInnerView}}>
         <View style={{flexDirection: 'row', flex: 1}}>
-          <View style={{borderRadius: '50vh', flex: greenPart, backgroundColor: '#3d9470'}}></View>
+          <View style={{borderRadius: '50vh', flex: greenPart, backgroundColor: theme.positive}}></View>
           <View style={{borderRadius: '50vh', flex: invisiblePart, backgroundColor: 'transparent'}}></View>
         </View>
         <View style={{...styles.progressBarText}}>
@@ -230,6 +242,7 @@ const ProgressBar = ({currentCard, lastCard}) => {
 }
 
 const FlashCard = ({ deckJson, cardNumber, side}) => {
+  const { theme, updateTheme } = useContext(ThemeContext);
   return (
     <View style={{ ...styles.flashcardView }}>
       <View style={styles.flashcardInnerView}>
@@ -243,6 +256,7 @@ const FlashCard = ({ deckJson, cardNumber, side}) => {
 
 
 const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
+  const { theme, updateTheme } = useContext(ThemeContext);
   const errorsPerRun = perRunStatisticsArray?.['statistics']?.['errorsPerRun'] ?? [];
 
   return(
@@ -253,9 +267,9 @@ const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
           {
           return(
             <View key={index} style={{flex: 1}}>
-              <View style={{flex: key[2], backgroundColor: '#3d9470', marginLeft: 2, marginRight: 2}}></View>
+              <View style={{flex: key[2], backgroundColor: theme.positive, marginLeft: 2, marginRight: 2}}></View>
               <View style={{flex: key[1], backgroundColor: 'dimgrey', marginLeft: 2, marginRight: 2}}></View>
-              <View style={{flex: key[0], backgroundColor: 'pink', marginLeft: 2, marginRight: 2}}></View>
+              <View style={{flex: key[0], backgroundColor: theme.negative, marginLeft: 2, marginRight: 2}}></View>
             </View>
           )
         }

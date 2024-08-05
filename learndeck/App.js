@@ -2,11 +2,11 @@
 
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, SafeAreaView, TextInput, Alert} from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Cell, Section, TableView} from 'react-native-tableview-simple';
 import {useState,useRef, useImperativeHandle, forwardRef, useEffect} from 'react';
-import React from 'react';
+import React, { useContext } from 'react';
 import Collapsible from 'react-native-collapsible';
 import Markdown from 'react-native-markdown-display';
 import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
@@ -19,10 +19,16 @@ import styles from './styles/mainStyles'
 import CardDecks from './components/cardDecks'
 import HomeScreen from './components/homeScreen'
 import EditScreen from './components/editScreen'
+import StatisticsScreen from './components/statisticsScreen'
+import SettingsScreen from './components/settingsScreen'
+
+import { ThemeContext, useTheme } from './styles/theme';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const themeContext = useTheme();
+  const { theme, updateTheme } = useContext(ThemeContext);
   const [firstLaunch, setFirstLaunch] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -46,9 +52,14 @@ export default function App() {
               console.log('Failed to one key', error);
             }
           }
+
+          //saving the default settings file
+          const DefaultSettingsJson = require('./assets/data/default_settings.json');
+          await AsyncStorage.setItem('userSettings', JSON.stringify(DefaultSettingsJson));
           console.log('App was launched the first time')
         }else{
           console.log('App was already launched once')
+          
         }
       } catch (error) {
         console.log('Failed to get all keys', error);
@@ -61,17 +72,29 @@ export default function App() {
   return (
     isLoading ? (<></>) : 
     (
+    <ThemeContext.Provider value={themeContext}>
     <NavigationContainer style={{}}>
       <Stack.Navigator screenOptions={{}} initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{headerStyle: {backgroundColor: 'beige'}}} />
+        <Stack.Screen name="Home" component={HomeScreen} options={({ navigation, route }) => ({
+          headerStyle: { backgroundColor: theme.primary }
+        })} />
+        <Stack.Screen 
+          name="StatisticsScreen" 
+          component={StatisticsScreen} 
+          options={({ navigation }) => ({
+            headerStyle: { backgroundColor: theme.primary },
+            title: 'Statistics',
+          })}
+        />
+        <Stack.Screen name="Settings" component={SettingsScreen} options={{headerStyle: {backgroundColor: theme.primary}, title: 'Settings'}} />
         <Stack.Screen name="Card Decks" component={CardDecks} options={{headerStyle: {
-            backgroundColor: 'beige',
+            backgroundColor: theme.primary,
           },}}/>
         <Stack.Screen name="Edit Deck" component={EditScreen} options={
           ({ route }) => ({ 
               title: 'Edit Deck', 
               headerStyle: {
-              backgroundColor: 'beige',
+              backgroundColor: theme.primary,
               deckName: route.params.deckName, 
               deckStorageId: route.params.deckStorageId,
               unmountOnBlur: true
@@ -85,12 +108,13 @@ export default function App() {
               deck: route.params.deck, 
               storageId: route.params.storageId, 
               headerStyle: {
-              backgroundColor: 'beige'
+              backgroundColor: theme.primary
             }
           })
         }/>
       </Stack.Navigator>
     </NavigationContainer>
+    </ThemeContext.Provider>
     )
   )
 }

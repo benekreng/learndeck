@@ -1,22 +1,19 @@
 import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, TextInput, Alert} from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import {useState,useRef, useImperativeHandle, forwardRef, useEffect} from 'react';
+import {useState,useRef, useImperativeHandle, forwardRef, useEffect, useContext} from 'react';
 import React from 'react';
-
-
 import Markdown from 'react-native-markdown-display';
-
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 import ButtonElement from './buttonElement'
 // import { styles, styleElements} from '../styles/mainStyles'
 import styles from '../styles/mainStyles'
 import { jsx } from 'react/jsx-runtime';
+import { ThemeContext } from '../styles/theme';
 
 const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJson, frontCardContent, backCardContent, cardNumber, side, additionalStyle, editButtonText="edit"}) => {
+	const { theme, updateTheme } = useContext(ThemeContext);
 	const [editMode, setEditMode] = useState(0);
 
 	const storeNewContent = (text, side) => {
@@ -51,7 +48,7 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 		//if the card id was 0 then the button has been pressed in save mode
 		if(cardID == 0){
 			saveNewCardsToAsncStorage(deckJson)
-			console.log("Prompt to save Content", cardID)
+			console.log("Prompt to save Content", deckJson)
 		}
 	}
 
@@ -71,8 +68,8 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 				<EditButton callback={editButtonPress}
 										cardID={1}
 										name={(editMode==1) ? "Save" : "edit"} 
-										editButtonStyle={(editMode==1) ? {backgroundColor: '#3d9470'} : {}} 
-										customStyle={{position: 'absolute', backgroundColor: 'pink'}}
+										editButtonStyle={(editMode==1) ? {backgroundColor: theme.positive} : {}} 
+										customStyle={{position: 'absolute', backgroundColor: theme.negative}}
 				/>
 			</View>
 
@@ -90,8 +87,8 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 				<EditButton callback={editButtonPress}
 										cardID={2}
 										name={(editMode==2) ? "Save" : "edit"} 
-										editButtonStyle={(editMode==2) ? {backgroundColor: '#3d9470'} : {}} 
-										customStyle={{position: 'absolute', backgroundColor: 'pink'}}
+										editButtonStyle={(editMode==2) ? {backgroundColor: theme.positive} : {}} 
+										customStyle={{position: 'absolute', backgroundColor: theme.negative}}
 				/>
 				<DeleteButton callback={deleteButtonPress}
 										name={"Delete"}
@@ -103,6 +100,7 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 };
 
 const EditButton = ({name, editButtonStyle, callback, cardID, customStyle}) => {
+	const { theme, updateTheme } = useContext(ThemeContext);
 	const whenPressed = () => {
 		if(name == "Save"){
 			callback(0);
@@ -112,18 +110,19 @@ const EditButton = ({name, editButtonStyle, callback, cardID, customStyle}) => {
 	}
 
 	return (
-		<TouchableOpacity style={{position: 'absolute', backgroundColor: 'pink', padding: 10, margin: 5, top: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
+		<TouchableOpacity style={{position: 'absolute', backgroundColor: theme.negative, padding: 10, margin: 5, top: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
 			<Text numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText02}}> {name}</Text>
 		</TouchableOpacity>
 	)
 }
 
 const DeleteButton = ({name, callback, cardID, customStyle}) => {
+	const { theme, updateTheme } = useContext(ThemeContext);
 	const whenPressed = () => {
 		callback();
 	}
 	return (
-		<TouchableOpacity style={{ position: 'absolute', backgroundColor: 'pink', padding: 10, margin: 5, bottom: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
+		<TouchableOpacity style={{ position: 'absolute', backgroundColor: theme.negative, padding: 10, margin: 5, bottom: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
 			<Text numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText02}}> {name}</Text>
 		</TouchableOpacity>
 	)
@@ -152,6 +151,7 @@ const EditableMarkdownBox = () => {
 
 
 const EditScreen = ({route}) => {
+	const { theme, updateTheme } = useContext(ThemeContext);
 	const { deckName, deckStorageId, onGoBack} = route.params;
 	const [deck, setDeck] = useState(deckName);
 	const [storageId, setDeckStorageID] = useState(deckStorageId);
@@ -161,6 +161,11 @@ const EditScreen = ({route}) => {
 	const [newName, setNewName] = useState(deck);
 	const [isLoaded, setIsLoaded] = useState(false);
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.primary },
+    });
+  }, [navigation, theme]);
 
 	const changeName = async () => {
 		if (newName === deck) {
@@ -182,10 +187,14 @@ const EditScreen = ({route}) => {
 			if (existingDeckJson === null) {
 				return Promise.resolve("No existing deck found with the name: " + deck);
 			}
+
+			console.log("This Json should contain the mofified card",JSON.stringify(deckJson))
 	
-			await AsyncStorage.setItem(newKeyName, existingDeckJson);
+			await AsyncStorage.setItem(newKeyName, JSON.stringify(deckJson));
+			// await AsyncStorage.setItem(newKeyName, existingDeckJson);
 			await AsyncStorage.removeItem(oldKeyName);
 			setDeck(newName);
+			setDeckStorageID(newKeyName);
 			return Promise.resolve("Deck renamed successfully.");
 	
 		} catch (error) {
@@ -303,12 +312,14 @@ const EditScreen = ({route}) => {
 		refresh();
 	}
 
-	
+  const handleGoBack = () => {
+    navigation.navigate('Card Decks', { refresh: true });
+  };
 
 	if(!deckJson || !isLoaded) return <Text>Loading: {String(!isLoaded)}</Text>
 	return(
 		<>
-		<ScrollView key={refreshProp} style={{backgroundColor: 'beige', position: 'relative'}}>
+		<ScrollView key={refreshProp} style={{backgroundColor: theme.primary, position: 'relative'}}>
 			{/* <Text style={{fontSize: 20, textAlign:'center', padding: 20}}>Name of Deck: </Text> */}
 			<View style={{alignItems: 'center', padding: 10}}>
 				<Text>Edit name:</Text>
@@ -318,26 +329,36 @@ const EditScreen = ({route}) => {
 			</View>
 			{deckJson?.['cards']?.map((card, index) => {
 				return(<BothMiniFlashCards key={index} deckJson={deckJson} cardNumber={index} refreshCallback={refresh} saveNewCardsToAsncStorage={saveNewCardsToAsncStorage}/>)
-				// return(<BothMiniFlashCards frontCardContent={card["front"]} backCardContent={card["back"]} deckJson={deckJson}/>)
 			})}
 		</ScrollView>
-		<View style={{flexDirection: 'row', flex: 1, position: 'absolute', bottom: 0, margin: 10}}>
-		<View style={{ flex: 6}}></View>
-			<TouchableOpacity onPress={addNewCard} style={{...styles.bannerEditButton, backgroundColor: '#3d9470', flex: 1, aspectRatio: 1/1, position: 'relative', borderRadius: '50vh', alignItems: 'center', justifyContent: 'center'}}>
-				<View style={{
-					width: '60%',
-					height: '10%',
-					backgroundColor: 'black',
-					position: 'absolute',
-				}} />
-				<View style={{
-					width: '10%',
-					height: '60%',
-					backgroundColor: 'black',
-					position: 'absolute',
-				}} />
-			</TouchableOpacity>
-		</View>
+    <TouchableOpacity onPress={addNewCard} 
+    style={{...styles.bannerEditButton,  
+            backgroundColor: theme.positive, 
+            aspectRatio: 1/1, 
+            position: 'relative', 
+            borderRadius: '50vh', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            position: 'absolute',
+            padding: 10,
+            width: '25%',
+            right: '4%',
+            bottom: '4%',
+          }}
+    >
+      <View style={{
+        width: '60%',
+        height: '10%',
+        backgroundColor: 'black',
+        position: 'absolute',
+      }} />
+      <View style={{
+        width: '10%',
+        height: '60%',
+        backgroundColor: 'black',
+        position: 'absolute',
+      }} />
+    </TouchableOpacity>
 		</>
 	) 
 }

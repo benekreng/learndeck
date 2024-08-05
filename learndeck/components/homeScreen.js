@@ -1,16 +1,19 @@
 import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, SafeAreaView, TextInput, Alert} from 'react-native';
 import { NavigationContainer, useNavigation, useFocusEffect } from '@react-navigation/native';
 import {useState,useRef, useImperativeHandle, forwardRef, useEffect} from 'react';
-import React from 'react';
+import React, {useContext} from 'react';
 import Collapsible from 'react-native-collapsible';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
+import { ThemeContext } from '../styles/theme';
 
 const CardDeckBannerCell = forwardRef(({name, storageId, pressed}, ref) => {
+  
   const navigation = useNavigation();
   const [isOpened, setOpened] = useState(true);
+	// const [today, setToday] = useState(moment().format('YYYY-MM-DD'));
 
   useImperativeHandle(ref, () => ({
     changeLocalCollapseState
@@ -25,7 +28,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed}, ref) => {
   }
 
   return(
-  <View style={{...styles.bannerOuterView, flex: 1, maxHeight: 100, marginLeft: 10, marginRight: 10}}>
+  <View style={{...styles.bannerOuterView, flex: 1, maxHeight: 100, marginLeft: 10, marginRight: 10}} >
     <TouchableOpacity style={{...styles.banner, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' , borderRadius: '50vh'}} onPress={pressed}>
         <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', textAlign: 'center', flex: 1}}> {name} </Text>
     </TouchableOpacity>
@@ -46,6 +49,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed}, ref) => {
 });
 
 function HomeScreen(){
+  const { theme, updateTheme } = useContext(ThemeContext);
 	const navigation = useNavigation();
   const [cardDeckStorageKeys, setCardDeckStorageKeys] = useState([]);
   const [cardDeckNames, setCardDeckNames] = useState([]);
@@ -53,6 +57,12 @@ function HomeScreen(){
   const [refreshHook, setRefreshHook] = useState(0);
   const deckBannerRef = useRef([]);
   const scrollViewRef = useRef(null);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.primary },
+    });
+  }, [navigation, theme]);
 
   // useFocusEffect(
   //   React.useCallback(() => {
@@ -77,18 +87,18 @@ function HomeScreen(){
 
   // if(!isLoaded) return(<></>)
   return (
-    <View key={refreshHook} ref={scrollViewRef} style={{flex: 1, backgroundColor: 'beige', justifyContent: 'flex-start'}}>
+    <View key={refreshHook} ref={scrollViewRef} style={{flex: 1, backgroundColor: theme.primary, justifyContent: 'flex-start'}}refresh={theme}>
 
 			<Text style={{textAlign: 'center', marginTop: 20, fontSize: 20}}>Streak 🔥: 2</Text>
 			<Text style={{textAlign: 'center', marginTop: 20, fontSize: 20}}>Reach todays goal!</Text>
-			<View style={{...styles.dailyGoalOuterView, backgroundColor: '#3d9470', borderRadius: '20vh', margin: 30}}>
+			<View style={{...styles.dailyGoalOuterView, backgroundColor: theme.positive, borderRadius: '20vh', margin: 30}}>
 				<Text style={{...styles.midText02, alignSelf: 'center', padding: 20}}>Complete one Study Session!</Text>
 			</View>
 
 			<CardDeckBannerCell key={"Your Decks"} name={"Your Decks"} pressed={() => navigation.navigate("Card Decks")}/>
 			<CardDeckBannerCell key={"Create New"} name={"Create New"} pressed={() => navigation.navigate('Edit Deck', { deckName: null, storageId: null})}/>
 			<CardDeckBannerCell key={"Community Decks"} name={"Community Decks"} pressed={handleCollapse}/>
-			<CardDeckBannerCell key={"Settings"} name={"Settings"} pressed={handleCollapse}/>
+			<CardDeckBannerCell key={"Settings"} name={"Settings"} pressed={() => navigation.navigate("Settings")}/>
  {/* ref={deckBannerRef.current[idx]} */}
     </View>
   )

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { theme } from '../styles/theme.js';
 
 const styleElements = StyleSheet.create({
   borderAndShadow: {
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
   },
   bannerEditButton: {
     backgroundColor: 'pink', 
+    // backgroundColor: theme.negative, 
     textAlign: 'center', 
     justifyContent: "center", 
     alignItems: 'center',
@@ -90,7 +92,8 @@ const styles = StyleSheet.create({
   flashcardInnerView: {
     flex: 1,
     margin: 10,
-    backgroundColor: 'pink',
+    backgroundColor: 'pink', 
+    // backgroundColor: theme.negative,
     borderRadius: '20px',
     backgroundColor: 'white',
     borderWidth: 3,
@@ -146,7 +149,10 @@ const styles = StyleSheet.create({
 	},
   dailyGoalOuterView: {
 		...styleElements.borderAndShadow,
-  }
+  },
+  borderAndShadowDefault: {
+		...styleElements.borderAndShadow,
+  },
 });
 
 export default styles;
