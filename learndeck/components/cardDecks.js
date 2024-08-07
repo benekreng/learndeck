@@ -71,7 +71,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
   return(
   <View style={styles.bannerOuterView}>
     <TouchableOpacity style={{...styles.banner, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={(event) => pressed(event, name)}>
-      <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', flex: 1}}> {name} </Text>
+      <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', flex: 1}}>{name}</Text>
       <View style={{flexDirection: 'column'}}>
         <TouchableOpacity style={{backgroundColor: 'darkgrey', padding: 5, marginBottom: 8, borderWidth: '2'}} onPress={() => deleteDeck()} >
           <Text>Delete</Text>

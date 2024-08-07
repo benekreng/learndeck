@@ -21,6 +21,7 @@ import HomeScreen from './components/homeScreen'
 import EditScreen from './components/editScreen'
 import StatisticsScreen from './components/statisticsScreen'
 import SettingsScreen from './components/settingsScreen'
+import CommunityDecks from './components/communityDecks'
 
 import { ThemeContext, useTheme } from './styles/theme';
 
@@ -59,7 +60,7 @@ export default function App() {
           console.log('App was launched the first time')
         }else{
           console.log('App was already launched once')
-          
+
         }
       } catch (error) {
         console.log('Failed to get all keys', error);
@@ -76,6 +77,9 @@ export default function App() {
     <NavigationContainer style={{}}>
       <Stack.Navigator screenOptions={{}} initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} options={({ navigation, route }) => ({
+          headerStyle: { backgroundColor: theme.primary }
+        })} />
+        <Stack.Screen name="Community Decks" component={CommunityDecks} options={({ navigation, route }) => ({
           headerStyle: { backgroundColor: theme.primary }
         })} />
         <Stack.Screen 

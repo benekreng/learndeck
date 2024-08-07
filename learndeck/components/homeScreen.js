@@ -97,9 +97,8 @@ function HomeScreen(){
 
 			<CardDeckBannerCell key={"Your Decks"} name={"Your Decks"} pressed={() => navigation.navigate("Card Decks")}/>
 			<CardDeckBannerCell key={"Create New"} name={"Create New"} pressed={() => navigation.navigate('Edit Deck', { deckName: null, storageId: null})}/>
-			<CardDeckBannerCell key={"Community Decks"} name={"Community Decks"} pressed={handleCollapse}/>
+			<CardDeckBannerCell key={"Community Decks"} name={"Community Decks"} pressed={() => navigation.navigate("Community Decks")}/>
 			<CardDeckBannerCell key={"Settings"} name={"Settings"} pressed={() => navigation.navigate("Settings")}/>
- {/* ref={deckBannerRef.current[idx]} */}
     </View>
   )
 }

@@ -10,7 +10,7 @@ import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 
-const SettingsScreen = ({route}) => {
+const CommunityDecks = ({route}) => {
   //load from storage to memory to read and write the statistics
   const { theme, updateTheme } = useContext(ThemeContext);
   // const { deckName, deckStorageId} = route.params;
@@ -75,7 +75,6 @@ const SettingsScreen = ({route}) => {
         }
       }
     ])
-
   }
 
   if(!isLoaded) return <View style={{backgroundColor: theme.primary, flex: 1}}></View>
@@ -113,4 +112,4 @@ const ColorThemePreview = ({colors, id, changeColorTheme}) => {
 
 
 
-export default SettingsScreen;
+export default CommunityDecks;

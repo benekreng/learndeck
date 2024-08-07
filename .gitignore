@@ -35,3 +35,34 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
+
+
+### ignores for ruby on rails backend
+
+# Ignore bundler config.
+/backend/learndeck_api/.bundle
+
+# Ignore all environment files (except templates).
+/backend/learndeck_api/.env*
+!/backend/learndeck_api/.env*.erb
+
+# Ignore all logfiles and tempfiles.
+/backend/learndeck_api/log/*
+/backend/learndeck_api/tmp/*
+!/backend/learndeck_api/log/.keep
+!/backend/learndeck_api/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/backend/learndeck_api/tmp/pids/*
+!/backend/learndeck_api/tmp/pids/
+!/backend/learndeck_api/tmp/pids/.keep
+
+# Ignore storage (uploaded files in development and any SQLite databases).
+/backend/learndeck_api/storage/*
+!/backend/learndeck_api/storage/.keep
+/backend/learndeck_api/tmp/storage/*
+!/backend/learndeck_api/tmp/storage/
+!/backend/learndeck_api/tmp/storage/.keep
+
+# Ignore master key for decrypting credentials and more.
+/backend/learndeck_api/config/master.key
