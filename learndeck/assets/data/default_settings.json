@@ -1,0 +1,12 @@
+{
+  "selectedColorTheme": "0",
+  "colorthemes": [
+  //[backgorund color, negative accent, positive accent, neutral accent, text color 1]
+    ["#f5f5dc","#ffb6c1","#3d9470","#2D3047", "#ffffff"],
+    ["#F7EDE2","#F28482","#84A59D","#F6BD60", "#000000"], //#F5CAC3
+    ["#F9F9F9", "#E072A4", "#B0E298", "#6883BA", "#000000"],
+    [ "#F0F0F0", "#D55E00", "#009E73", "#E69F00", "#000000"],
+    [ "#F0F0F0", "#E69F00", "#56B4E9", "#0072B2", "#000000"]
+
+  ]
+}
