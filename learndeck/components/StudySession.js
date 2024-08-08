@@ -153,13 +153,13 @@ const StudySession = ({route}) => {
               {/* box area to hold statistics */}
               <View style={{...styles.statisticsBox}}>
                   <Text style={{...styles.midText02, alignSelf: 'center', padding: 20}}>This Session</Text>
-                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.positive, borderRadius: '50vh'}}>
+                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.positive, borderRadius: 50}}>
                     <Text style={{...styles.midText00}}> Correct: {sessionScore[2]} </Text>
                   </View>
-                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey', borderRadius: '50vh'}}>
+                  <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey', borderRadius: 50}}>
                     <Text style={{...styles.midText00}}>Unsure: {sessionScore[1]}</Text>
                   </View>
-                  <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.negative, borderRadius: '50vh'}}>
+                  <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.negative, borderRadius: 50}}>
                     <Text style={{...styles.midText00}}>Wrong: {sessionScore[0]}</Text>
                   </View>
                   <Text style={{alignSelf: 'center', padding: 20, paddingBottom: 0}}>All Sessions Graph</Text>
@@ -214,8 +214,8 @@ const ProgressBar = ({currentCard, lastCard}) => {
   return (
       <View style={{...styles.progressBarInnerView}}>
         <View style={{flexDirection: 'row', flex: 1}}>
-          <View style={{borderRadius: '50vh', flex: greenPart, backgroundColor: theme.positive}}></View>
-          <View style={{borderRadius: '50vh', flex: invisiblePart, backgroundColor: 'transparent'}}></View>
+          <View style={{borderRadius: 50, flex: greenPart, backgroundColor: theme.positive}}></View>
+          <View style={{borderRadius: 50, flex: invisiblePart, backgroundColor: 'transparent'}}></View>
         </View>
         <View style={{...styles.progressBarText}}>
           <Text numberOfLines={1} adjustsFontSizeToFit style={{textAlign: 'center', fontSize: 15}}> {progress} </Text>

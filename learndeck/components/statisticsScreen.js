@@ -76,13 +76,13 @@ const StatisticsScreen = ({route}) => {
     <View style={{backgroundColor: theme.primary, flex: 1}}>
       <View style={{...styles.statisticsBox}}>
         <Text style={{...styles.midText02, alignSelf: 'center', padding: 20}}>This Session</Text>
-        <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.positive, borderRadius: '50vh'}}>
+        <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.positive, borderRadius: 50}}>
           <Text style={{...styles.midText00}}> Correct: {percentages[2]} %</Text>
         </View>
-        <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey', borderRadius: '50vh'}}>
+        <View numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: 'grey', borderRadius: 50}}>
           <Text style={{...styles.midText00}}> Unsure: {percentages[1]} %</Text>
         </View>
-        <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.negative, borderRadius: '50vh'}}>
+        <View  numberOfLines={1} adjustsFontSizeToFit style={{alignSelf: 'center', padding: 5, margin: 5, backgroundColor: theme.negative, borderRadius: 50}}>
           <Text style={{...styles.midText00}}> Wrong: {percentages[0]} %</Text>
         </View>
         <Text style={{alignSelf: 'center', padding: 20, paddingBottom: 0}}>All Sessions Graph</Text>

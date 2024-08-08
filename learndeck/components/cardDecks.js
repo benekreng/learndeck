@@ -68,35 +68,44 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
   }
 
   return(
-  <View style={styles.bannerOuterView}>
-    <TouchableOpacity style={{...styles.banner, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={(event) => pressed(event, name)}>
-      <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', flex: 1}}>{name}</Text>
-      <View style={{flexDirection: 'column'}}>
-        <TouchableOpacity style={{backgroundColor: 'darkgrey', padding: 5, marginBottom: 8, borderWidth: '2'}} onPress={() => deleteDeck()} >
-          <Text>Delete</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{...styles.bannerEditButton, padding: 0, backgroundColor: theme.negative}} onPress={() => navigation.navigate('Edit Deck', { deckName: name, deckStorageId: storageId})} >
-          <Text style={{padding: 0, margin: 0}}>Edit</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-    <Collapsible collapsed={isOpened} duration={400} easing={'easeOutCubic'} style={{padding: 10}}>
-      <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 0}}>
-        <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: 50}}>
-          <Text style={{color: 'white', fontWeight: 400}}>Choose Study Mode</Text>
+    false ? 
+    (
+    <View style={styles.bannerOuterView}>
+        <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', flex: 1}}>{name}</Text>
+    </View>
+
+    ):
+    (
+      <View style={styles.bannerOuterView}>
+      <TouchableOpacity style={{...styles.banner, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={(event) => pressed(event, name)}>
+        <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', flex: 1}}>{name}</Text>
+        <View style={{flexDirection: 'column'}}>
+          <TouchableOpacity style={{backgroundColor: 'darkgrey', padding: 5, marginBottom: 8, borderWidth: 2}} onPress={() => deleteDeck()} >
+            <Text>Delete</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{...styles.bannerEditButton, padding: 0, backgroundColor: theme.negative}} onPress={() => navigation.navigate('Edit Deck', { deckName: name, deckStorageId: storageId})} >
+            <Text style={{padding: 0, margin: 0}}>Edit</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-      <StudyModeElement studyMode="Study This Deck" deck={name} storageId={storageId}/>
-      {/* <StudyModeElement studyMode="Study Weaknesses" deck={name} storageId={storageId}/> */}
-      {/* <StudyModeElement studyMode="Study Mixed" deck={name} storageId={storageId}/>
-      <StudyModeElement studyMode="Study Comprehensive" deck={name} storageId={storageId}/> */}
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
-        <ButtonElement  name="Reset Stats" style={{marginRight: 5, marginLeft: 5}} onPress={()=> resetStatistics()}/>
-        {/* <ButtonElement  name="Archive" style={{marginRight: 5, marginLeft: 5}}/> */}
-        <ButtonElement name="See Stats" style={{marginRight: 5, marginLeft: 5}} onPress={()=> navigation.navigate("StatisticsScreen", { deckName: name, deckStorageId: storageId})}/>
-      </View>
-    </Collapsible>
-  </View>
+      </TouchableOpacity>
+      <Collapsible collapsed={isOpened} duration={400} easing={'easeOutCubic'} style={{padding: 10}}>
+        <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 0}}>
+          <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: 50}}>
+            <Text style={{color: 'white', fontWeight: 400}}>Choose Study Mode</Text>
+          </View>
+        </View>
+        <StudyModeElement studyMode="Study This Deck" deck={name} storageId={storageId}/>
+        {/* <StudyModeElement studyMode="Study Weaknesses" deck={name} storageId={storageId}/> */}
+        {/* <StudyModeElement studyMode="Study Mixed" deck={name} storageId={storageId}/>
+        <StudyModeElement studyMode="Study Comprehensive" deck={name} storageId={storageId}/> */}
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
+          <ButtonElement  name="Reset Stats" style={{marginRight: 5, marginLeft: 5}} onPress={()=> resetStatistics()}/>
+          {/* <ButtonElement  name="Archive" style={{marginRight: 5, marginLeft: 5}}/> */}
+          <ButtonElement name="See Stats" style={{marginRight: 5, marginLeft: 5, flex: 1}} onPress={()=> navigation.navigate("StatisticsScreen", { deckName: name, deckStorageId: storageId})}/>
+        </View>
+      </Collapsible>
+    </View>
+    )
   )
 });
 
@@ -183,8 +192,11 @@ const CardDecks = () => {
     <>
     <ScrollView key={refreshHook} ref={scrollViewRef} style={{backgroundColor: theme.primary, position: 'relative'}}>
       <View style={{padding: 5}}></View>
-        {cardDeckNames.map((key, idx) => 
-          (<CardDeckBannerCell key={key} name={key} storageId={cardDeckStorageKeys[idx]} pressed={handleCollapse} ref={deckBannerRef.current[idx]} refreshParent={refresh}/>)
+        {cardDeckNames.map((key, idx) => {
+          console.log("this should be the an object", key)
+
+         return(<CardDeckBannerCell key={key} name={key} storageId={cardDeckStorageKeys[idx]} pressed={handleCollapse} ref={deckBannerRef.current[idx]} refreshParent={refresh}/>)
+        }
         )}
     </ScrollView>
     <TouchableOpacity onPress={() => navigation.navigate('Edit Deck', { deckName: null, storageId: null})} 

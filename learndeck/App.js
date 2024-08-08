@@ -1,5 +1,3 @@
-// import DefaultCardDecksCollection from './assets/data/default_card_decks.json'
-
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, SafeAreaView, TextInput, Alert} from 'react-native';
 import { NavigationContainer, useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -27,6 +25,8 @@ import { ThemeContext, useTheme } from './styles/theme';
 
 const Stack = createNativeStackNavigator();
 
+const STORAGE_KEY = 'appWasLaunchedOnce';
+
 export default function App() {
   const themeContext = useTheme();
   const { theme, updateTheme } = useContext(ThemeContext);
@@ -39,31 +39,37 @@ export default function App() {
       try {
         const DefaultCardDecksCollection = require('./assets/data/default_card_decks.json')
         const keys = await AsyncStorage.getAllKeys();
-        console.log("All the keys from the start> ", keys)
-        if(keys.length === 0){
-          for await (const [key, value] of Object.entries(DefaultCardDecksCollection)){
-            console.log('first launch')
-            storageId = "carddeck_" + key
-            try {
-              await AsyncStorage.setItem(
-                storageId,
-                JSON.stringify(DefaultCardDecksCollection[key])
-              );
-            } catch (error) {
-              console.log('Failed to one key', error);
+        const storedData = await AsyncStorage.getItem("appWasLaunchedOnce");
+        console.log("All the keys that where in async storage: ", keys);
+        if(storedData == null){
+          try{
+            await AsyncStorage.setItem("appWasLaunchedOnce", "this key signified that the app has been already launched once");
+            for await (const [key, value] of Object.entries(DefaultCardDecksCollection)){
+              console.log('first launch')
+              storageId = "carddeck_" + key
+              try {
+                await AsyncStorage.setItem(
+                  storageId,
+                  JSON.stringify(DefaultCardDecksCollection[key])
+                );
+              } catch (error) {
+                console.log('Failed to one key', error);
+              }
             }
-          }
 
-          //saving the default settings file
-          const DefaultSettingsJson = require('./assets/data/default_settings.json');
-          await AsyncStorage.setItem('userSettings', JSON.stringify(DefaultSettingsJson));
-          console.log('App was launched the first time')
+            //saving the default settings file
+            const DefaultSettingsJson = require('./assets/data/default_settings.json');
+            await AsyncStorage.setItem('userSettings', JSON.stringify(DefaultSettingsJson));
+            console.log('App was launched the first time')
+          }catch(err){
+            console.log('Failed to set up default async storage environment. Clearing async storage.', error);
+            await AsyncStorage.clear();
+          }
         }else{
           console.log('App was already launched once')
-
         }
-      } catch (error) {
-        console.log('Failed to get all keys', error);
+      }catch(err) {
+        console.log('Failed to set up default async storage environment', err);
       }
       setIsLoading(false)
     })();

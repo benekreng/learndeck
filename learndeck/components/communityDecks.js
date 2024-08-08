@@ -15,7 +15,8 @@ const SettingsScreen = ({route}) => {
   const [settingJson, setSettingJson] = useState();
   const [isLoaded, setIsLoaded] = useState(false);
   const navigation = useNavigation();
-  const apiBaseUrl = 'http://localhost:3000/'
+  // const apiBaseUrl = 'http://localhost:3000/'
+  const apiBaseUrl = 'http://194.164.197.201:45659/'
 
   useEffect(() => {
     navigation.setOptions({

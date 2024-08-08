@@ -1,5 +1,5 @@
 {
-  "Programming Questions": {
+  "ProgrammingQuestions": {
     "statistics": {
       "errorsPerRun": []
     },
@@ -23,37 +23,7 @@
         "front": "Describe the use of the volatile keyword in C.",
         "back": "The volatile keyword is used in C to tell the compiler that the value of the variable may change at any time without any action being taken by the code the compiler finds nearby. This is often used in multi-threaded applications and with hardware that modifies its state independently from the running program.",
         "statistics": [0, 0, 0]
-      },
-      // {
-      //   "front": "What is tail recursion? Provide an example.",
-      //   "back": "Tail recursion is a recursion where the recursive call is the last operation in the function. It allows for optimization by compilers into iteration, which prevents stack overflow. Example: Calculating factorial in a tail-recursive manner involves an accumulator parameter to carry the factorial value.",
-      //   "statistics": [0, 0, 0]
-      // },
-      // {
-      //   "front": "Discuss the concept of RAII in C++ and its benefits.",
-      //   "back": "Resource Acquisition Is Initialization (RAII) is a programming idiom used in C++ to manage resource allocation and deallocation. RAII ensures that resources such as memory, file handles, and network connections are properly cleaned up when the owning object is destroyed, thus helping to prevent resource leaks and undefined behavior.",
-      //   "statistics": [0, 0, 0]
-      // },
-      // {
-      //   "front": "Explain the difference between overriding and overloading in object-oriented programming.",
-      //   "back": "Overriding is when a derived class implements a method of its base class that has the same signature, changing its behavior. Overloading is when two or more methods in the same scope have the same name but different parameters, allowing methods to be called based on the argument types.",
-      //   "statistics": [0, 0, 0]
-      // },
-      // {
-      //   "front": "What is a race condition and how can it be prevented?",
-      //   "back": "A race condition occurs when two or more threads can access shared data and they try to change it at the same time. It can be prevented by using synchronization techniques like mutexes, locks, or by designing software where thread interference is minimized or eliminated.",
-      //   "statistics": [0, 0, 0]
-      // },
-      // {
-      //   "front": "Describe how garbage collection works in Java.",
-      //   "back": "Garbage collection in Java automatically deallocates memory that objects no longer use. The JVM periodically checks which objects are no longer reachable from any references in running code and frees the associated memory, helping to prevent memory leaks.",
-      //   "statistics": [0, 0, 0]
-      // },
-      // {
-      //   "front": "What are generics in programming, and how do they improve software development?",
-      //   "back": "Generics enable algorithms and classes to operate on generic types, allowing for code reuse across disparate data types. This leads to stronger type checks at compile time, elimination of casts, and the ability to implement generic algorithms. It simplifies the code and can lead to performance improvements.",
-      //   "statistics": [0, 0, 0]
-      // }
+      }
     ]
   }
 }
