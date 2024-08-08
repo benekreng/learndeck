@@ -1,15 +1,11 @@
-import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, TextInput, Alert} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import {useState,useRef, useImperativeHandle, forwardRef, useEffect, useContext} from 'react';
+import { Text, View, ScrollView, TouchableOpacity, TextInput, Alert} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import {useState, useEffect, useContext} from 'react';
 import React from 'react';
 import Markdown from 'react-native-markdown-display';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ButtonElement from './buttonElement'
-// import { styles, styleElements} from '../styles/mainStyles'
 import styles from '../styles/mainStyles'
-import { jsx } from 'react/jsx-runtime';
 import { ThemeContext } from '../styles/theme';
 
 const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJson, frontCardContent, backCardContent, cardNumber, side, additionalStyle, editButtonText="edit"}) => {
@@ -110,7 +106,7 @@ const EditButton = ({name, editButtonStyle, callback, cardID, customStyle}) => {
 	}
 
 	return (
-		<TouchableOpacity style={{position: 'absolute', backgroundColor: theme.negative, padding: 10, margin: 5, top: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
+		<TouchableOpacity style={{position: 'absolute', backgroundColor: theme.negative, padding: 10, margin: 5, top: 0, right: 0, borderRadius: 50, borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
 			<Text numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText02}}> {name}</Text>
 		</TouchableOpacity>
 	)
@@ -122,7 +118,7 @@ const DeleteButton = ({name, callback, cardID, customStyle}) => {
 		callback();
 	}
 	return (
-		<TouchableOpacity style={{ position: 'absolute', backgroundColor: theme.negative, padding: 10, margin: 5, bottom: 0, right: 0, borderRadius: '50vh', borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
+		<TouchableOpacity style={{ position: 'absolute', backgroundColor: theme.negative, padding: 10, margin: 5, bottom: 0, right: 0, borderRadius: 50, borderWidth: 2.5, alignContent: 'center',...customStyle,}} onPress={() => whenPressed()}>
 			<Text numberOfLines={1} adjustsFontSizeToFit style={{...styles.midText02}}> {name}</Text>
 		</TouchableOpacity>
 	)
@@ -229,8 +225,6 @@ const EditScreen = ({route}) => {
 					}).filter(num => num !== null);
 					
 					const highestNumber = numbers.length > 0? Math.max(...numbers) + 1 : 0;
-					// const newUntitledName = 'untitled' + String(Number(highestNumber));
-					// const newUntitledStorageKey = 'carddeck_' + newUntitledName;
 					const newUntitledName = `untitled${highestNumber}`;
 					const newUntitledStorageKey = `carddeck_${newUntitledName}`;
 					setDeck(newUntitledName);
@@ -265,22 +259,6 @@ const EditScreen = ({route}) => {
 		}
   }, []);
 
-	// useEffect(() => {
-  //   const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-  //     // Prevent default behavior of leaving the screen
-  //     e.preventDefault();
-
-  //     // Run your function here
-	// 		if(newDeck == true && newName == null){
-	// 			Alert("You have to give the Deck a name");
-	// 			return
-	// 		}
-	// 		console.log("left but async was probably too slow ")
-
-  //     // Manually navigate to the next screen
-  //     navigation.dispatch(e.data.action);
-  //   });
-	// });
 
 	const saveNewCardsToAsncStorage = async (newJson) => {
 			try{
@@ -297,11 +275,6 @@ const EditScreen = ({route}) => {
 	}
 	
 	const addNewCard = async () => {
-		// if(deck == null){
-		// 	Alert("You first have to choose a name");
-		// 	console.log("You first have to choose a name")
-		// 	return;
-		// }
 		const newCard = {
 			"front": "Edit Front",
 			"back": "Edit Back",
@@ -320,7 +293,6 @@ const EditScreen = ({route}) => {
 	return(
 		<>
 		<ScrollView key={refreshProp} style={{backgroundColor: theme.primary, position: 'relative'}}>
-			{/* <Text style={{fontSize: 20, textAlign:'center', padding: 20}}>Name of Deck: </Text> */}
 			<View style={{alignItems: 'center', padding: 10}}>
 				<Text>Edit name:</Text>
 				<View style={{borderWidth: 2}}>
@@ -336,7 +308,7 @@ const EditScreen = ({route}) => {
             backgroundColor: theme.positive, 
             aspectRatio: 1/1, 
             position: 'relative', 
-            borderRadius: '50vh', 
+            borderRadius: 50, 
             alignItems: 'center', 
             justifyContent: 'center',
             position: 'absolute',

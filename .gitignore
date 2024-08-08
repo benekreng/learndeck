@@ -1,5 +1,6 @@
 #assets, for now
 assets/
+!assets/data/
 # Logs
 logs
 *.log

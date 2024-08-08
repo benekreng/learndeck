@@ -1,13 +1,10 @@
 
-import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert} from 'react-native';
+import { Text, View, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {useState, useEffect, useContext} from 'react';
 import React from 'react';
-import Collapsible from 'react-native-collapsible';
-import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 

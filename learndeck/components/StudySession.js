@@ -4,8 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import {useState, useEffect, useContext} from 'react';
 import React from 'react';
 import Collapsible from 'react-native-collapsible';
-import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Markdown from 'react-native-markdown-display';
 
 
 import ButtonElement from './buttonElement'
@@ -35,7 +35,6 @@ const StudySession = ({route}) => {
     (async () => {
       try {
         const deckAsJson = await AsyncStorage.getItem(storageId); 
-        console.log('this json has been fetched from the database ', deckAsJson)
         const deckParsed = JSON.parse(deckAsJson);
         const lastCardIndex = deckParsed['cards'].length-1;
         if(lastCardIndex == -1){
@@ -64,18 +63,9 @@ const StudySession = ({route}) => {
     
   }, [deckJson])
 
-  // const addNewPerRunArray = () => {
-  //   try{
-  //     deckJson['statistics']['errorsPerRun'].push([0,0,0]);
-  //     console.log(' per session arrays, right before adding a new empty array', deckJson['statistics']['errorsPerRun'])
-  //   }catch(err){
-  //     console.log('failed to append new per session statistics array', ' the array: ', deckJson['statistics']['errorsPerRun'], err)
-  //   }
-  // }
   const reloadStudySession = () => {
     setFlipped(false);
     setFinished(false);
-    // setSessionScore([0, 0, 0]);
     deckJson['statistics']['errorsPerRun'].push([0,0,0]);
   }
 
@@ -87,7 +77,6 @@ const StudySession = ({route}) => {
         let newScore = sessionScore[0] + 1
         setSessionScore([newScore, sessionScore[1], sessionScore[2]])
         deckJson['statistics']['errorsPerRun'][deckJson['statistics']['errorsPerRun'].length-1][0] += 1;
-        console.log('MEEEHLLLJKFLAJKALJ, ', deckJson['statistics']['errorsPerRun'], 'is of type: ', Array.isArray(deckJson['statistics']['errorsPerRun']))
 
       }else if(feedback == 'Unsure'){
         deckJson['cards'][currentCard]['statistics'][1] += 1
@@ -115,18 +104,12 @@ const StudySession = ({route}) => {
     setFinished(true);
     setNextCard(currentCard + 1);
     setSessionScore(deckJson['statistics']['errorsPerRun'][deckJson['statistics']['errorsPerRun'].length-1]);
-    console.log("Session array at the end", deckJson['statistics']['errorsPerRun'])
 
     try{
-      //console.log('Object', deck, ' to be stored: ', JSON.stringify(deckJson));
       (async () => {
           const jsonStringified = JSON.stringify(deckJson);
-          console.log('this is the stringified json', jsonStringified);
           await AsyncStorage.setItem(storageId, JSON.stringify(deckJson));
-          console.log('hi there')
           const theJson = await AsyncStorage.getItem(storageId);
-          console.log("It should be correctl stored", theJson)
-          console.log('bye')
         }
       )();
       
@@ -199,7 +182,7 @@ const StudySession = ({route}) => {
               </View>
             </Collapsible>
             {!isFlipped ? (
-            <ButtonElement name="FLIP" style={{backgroundColor: theme.neutral}} textStyle={{...styles.bigText}}onPress={()=> setFlipped(!isFlipped)}/>
+            <ButtonElement name="FLIP" style={{backgroundColor: theme.neutral}} textStyle={{...styles.bigText, color: theme.text02}}onPress={()=> setFlipped(!isFlipped)}/>
             ):
             (<></>)}
           </View>
@@ -247,7 +230,7 @@ const FlashCard = ({ deckJson, cardNumber, side}) => {
     <View style={{ ...styles.flashcardView }}>
       <View style={styles.flashcardInnerView}>
         <View style={styles.flashcardTextView}>
-          <Text>{deckJson?.['cards']?.[cardNumber]?.[side]}</Text>
+          <Markdown>{String(deckJson?.['cards']?.[cardNumber]?.[side])}</Markdown>
         </View>
       </View>
     </View>

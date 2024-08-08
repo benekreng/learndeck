@@ -1,19 +1,15 @@
-import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert} from 'react-native';
+import { Text, View, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {useState, useEffect} from 'react';
 import React, { useContext }  from 'react';
-import Collapsible from 'react-native-collapsible';
-import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 
 const CommunityDecks = ({route}) => {
   //load from storage to memory to read and write the statistics
   const { theme, updateTheme } = useContext(ThemeContext);
-  // const { deckName, deckStorageId} = route.params;
   const [settingJson, setSettingJson] = useState();
   const [isLoaded, setIsLoaded] = useState(false);
   const navigation = useNavigation();
@@ -82,12 +78,14 @@ const CommunityDecks = ({route}) => {
     <View style={{backgroundColor: theme.primary, justifyContent: 'flex-start', flex: 1}}>
       <Text style={{justifyContent: 'center',textAlign: 'center', fontSize: 20, padding: 20}}>Choose Color Theme</Text>
       <View style={{alignItems: 'center'}}>
-        {settingJson["colorthemes"].map((key, idx) => {
+        
+        {
+        settingJson?.["colorthemes"].map((key, idx) => {
           return <ColorThemePreview changeColorTheme={changeColorTheme} key={idx} id={idx} colors={settingJson["colorthemes"][idx]}></ColorThemePreview>
         })}
       </View>
       <Text style={{textAlign: 'center', fontSize: 20, padding: 20}}>Reset to factory settings</Text>
-      <TouchableOpacity onPress={()=>{resetToFactorySettings()}}style={{...styles.borderAndShadowDefault, marigin: 20, backgroundColor: theme.negative, borderRadius: '50vh', padding: 10, margin: 60, marginTop: 0}}>
+      <TouchableOpacity onPress={()=>{resetToFactorySettings()}}style={{...styles.borderAndShadowDefault, marigin: 20, backgroundColor: theme.negative, borderRadius: 50, padding: 10, margin: 60, marginTop: 0}}>
         <Text style={{textAlign: 'center'}}>Reset to factory settings</Text>
       </TouchableOpacity>
 
@@ -98,7 +96,7 @@ const CommunityDecks = ({route}) => {
 const ColorThemePreview = ({colors, id, changeColorTheme}) => {
   return(
     <View style={{width: '100%', margin: 10}}>
-      <TouchableOpacity onPress={()=> changeColorTheme(id)} style={{...styles.borderAndShadowDefault, marginLeft: '10%', marginRight: '10%', padding: 15, backgroundColor: 'grey', borderRadius: '50vh'}}>
+      <TouchableOpacity onPress={()=> changeColorTheme(id)} style={{...styles.borderAndShadowDefault, marginLeft: '10%', marginRight: '10%', padding: 15, backgroundColor: 'grey', borderRadius: 50}}>
         <View style={{flexDirection: 'row', marginLeft: 10, marginRight: 10, borderWidth: 2}}>
           <View style={{backgroundColor: colors[0], flex: 1, height: 20}}></View>
           <View style={{backgroundColor: colors[1], flex: 1}}></View>

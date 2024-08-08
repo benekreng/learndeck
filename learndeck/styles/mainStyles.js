@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     alignItems: 'center',
     padding: 20,
-    borderRadius: '50vh', 
+    borderRadius: 50, 
     borderWidth: 2, 
     aspectRatio: 1 / 1
   },
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75, 
     shadowRadius: 0, 
     borderWidth: 2,
-    borderRadius: '50vh', 
+    borderRadius: 50, 
     shadowOffset: { width: 3, height: 3 }, 
     flexGrow: 1, 
     margin: 10, 
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     margin: 10,
     backgroundColor: 'pink', 
     // backgroundColor: theme.negative,
-    borderRadius: '20px',
+    borderRadius: 20,
     backgroundColor: 'white',
     borderWidth: 3,
     shadowOffset: { width: 6, height: 6 }, 
@@ -118,9 +118,9 @@ const styles = StyleSheet.create({
     margin: 2,
     marginLeft: 30,
     marginRight: 30,
-    borderRadius: '50vh',
+    borderRadius: 50,
     backgroundColor: 'lightgrey',
-    borderRadius: '50vh', 
+    borderRadius: 50, 
     shadowOffset: { width: 1, height: 1 }, 
   },
 
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'lightgrey', 
 		margin: 20, 
 		marginTop: 5, 
-		borderRadius: '10px', 
+		borderRadius: 10, 
 		justifyContent: 'space-around'
 	},
   dailyGoalOuterView: {

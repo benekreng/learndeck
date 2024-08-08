@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, ImageBackground, ImageUri, Image, SafeAreaView, TextInput, Alert} from 'react-native';
+import { StyleSheet, Text, View, Button, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import { NavigationContainer, useNavigation, useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {useState,useRef, useImperativeHandle, forwardRef, useEffect, useCallback} from 'react';
 import React, {useContext} from 'react';
 import Collapsible from 'react-native-collapsible';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
-// import StatisticsScreen from './statisticsScreen'
 
 import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
@@ -83,8 +82,8 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
     </TouchableOpacity>
     <Collapsible collapsed={isOpened} duration={400} easing={'easeOutCubic'} style={{padding: 10}}>
       <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 0}}>
-        <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: '50vh'}}>
-          <Text style={{color: 'white', fontWeight: '400'}}>Choose Study Mode</Text>
+        <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: 50}}>
+          <Text style={{color: 'white', fontWeight: 400}}>Choose Study Mode</Text>
         </View>
       </View>
       <StudyModeElement studyMode="Study This Deck" deck={name} storageId={storageId}/>
@@ -193,7 +192,7 @@ const CardDecks = () => {
             backgroundColor: theme.positive, 
             aspectRatio: 1/1, 
             position: 'relative', 
-            borderRadius: '50vh', 
+            borderRadius: 50, 
             alignItems: 'center', 
             justifyContent: 'center',
             position: 'absolute',

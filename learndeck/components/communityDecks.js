@@ -2,11 +2,8 @@ import { Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Aler
 import { useNavigation } from '@react-navigation/native';
 import {useState, useEffect} from 'react';
 import React, { useContext }  from 'react';
-import Collapsible from 'react-native-collapsible';
-import { MD3LightTheme, Provider as PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 
@@ -34,18 +31,6 @@ const SettingsScreen = ({route}) => {
       setIsLoaded(true);
     })
     .catch(error => console.error(error));
-
-    // (async () => {
-    //   try {
-    //     const settingsSerializedJson = await AsyncStorage.getItem('userSettings'); 
-    //     const settingsToJson = await JSON.parse(settingsSerializedJson);
-    //     setSettingJson(settingsToJson);
-    //     setIsLoaded(true);
-  
-    //   } catch (error) {
-    //     console.log('Failed to retrieve data from storage', error);
-    //   }
-    // })();
   }, []);
 
   const addToLibrary = async (id) => {
@@ -70,9 +55,6 @@ const SettingsScreen = ({route}) => {
               <Text numberOfLines={3}  style={{ flex: 2}}>{key["description"]}</Text>
             </View>
             <View style={{flexDirection: 'column', flex: 1}}>
-              {/* <TouchableOpacity style={{backgroundColor: 'darkgrey', padding: 5, marginBottom: 8, borderWidth: '2'}} >
-                <Text>Delete</Text>
-              </TouchableOpacity> */}
               <TouchableOpacity style={{...styles.bannerEditButton, padding: 0, backgroundColor: theme.negative, marginLeft: 10}} onPress={()=> {addToLibrary(key["id"])}}>
                 <Text style={{ margin: 0}}>Add to Library</Text>
               </TouchableOpacity>

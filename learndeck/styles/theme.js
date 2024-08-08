@@ -8,6 +8,7 @@ const defaultTheme = {
   negative: '#ffb6c1',
   positive: '#3d9470',
   neutral: '#2D3047',
+  text02: '#ffffff',
 };
 
 export const ThemeContext = createContext({
@@ -41,6 +42,7 @@ export function useTheme() {
       negative: newTheme[1],
       positive: newTheme[2],
       neutral: newTheme[3],
+      text02: newTheme[4],
     });
   }, []);
 
