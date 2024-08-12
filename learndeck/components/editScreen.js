@@ -153,6 +153,10 @@ const EditScreen = ({route}) => {
 		if (newName === deck) {
 			return Promise.resolve("New name is the same as the old name. No change needed.");
 		}
+		//when string is empty return
+		if(newName === ""){
+			return;
+		}
 		
 		const oldKeyName = 'carddeck_' + deck;
 		const newKeyName = 'carddeck_' + newName;
