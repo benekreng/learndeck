@@ -36,7 +36,6 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 
 	const deleteThisCard = () => {
 		deckJson["cards"].splice(cardNumber, 1);
-		console.log("this card should be deleted now", JSON.stringify(deckJson))
 		saveNewCardsToAsncStorage(deckJson);
 		refreshCallback();
 	}
@@ -48,7 +47,6 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 		//if the card id was 0 then the button has been pressed in save mode
 		if(cardID == 0){
 			saveNewCardsToAsncStorage(deckJson)
-			console.log("Prompt to save Content", deckJson)
 		}
 	}
 
@@ -160,8 +158,6 @@ const EditScreen = ({route}) => {
 		const newKeyName = 'carddeck_' + newName;
 	
 		try {
-			console.log(newName, "submitted");
-	
 			//if key already exist abort
 			const existingNewDeckJson = await AsyncStorage.getItem(newKeyName);
 			if (existingNewDeckJson !== null) {
@@ -173,8 +169,6 @@ const EditScreen = ({route}) => {
 				return Promise.resolve("No existing deck found with the name: " + deck);
 			}
 
-			console.log("This Json should contain the mofified card",JSON.stringify(deckJson))
-	
 			await AsyncStorage.setItem(newKeyName, JSON.stringify(deckJson));
 			// await AsyncStorage.setItem(newKeyName, existingDeckJson);
 			await AsyncStorage.removeItem(oldKeyName);
@@ -232,7 +226,6 @@ const EditScreen = ({route}) => {
 					}catch(err){
 						console.log("failed to insert defaultDeckJson into async storage", err)
 					}
-					console.log("should have set is loaded to true")
 					setIsLoaded(true);
 					return;
 			})();

@@ -30,7 +30,6 @@ const StatisticsScreen = ({route}) => {
       try {
         const deckAsJson = await AsyncStorage.getItem(deckStorageId); 
         const deckParsed = await JSON.parse(deckAsJson);
-        console.log('this json has been fetched from the database ', deckAsJson)
         const lastCardIndex = deckParsed['statistics']['errorsPerRun'].length;
         setDeckJson(deckParsed);
 
@@ -42,13 +41,11 @@ const StatisticsScreen = ({route}) => {
         const errorList = deckParsed?.['statistics']?.['errorsPerRun'];
         for(i = 0; i < errorList.length; i++){
           correctSum += Number(errorList[i][0]);
-          console.log(correctSum)
           unsureSum += Number(errorList[i][1]);
           wrongSum += Number(errorList[i][2]);
         }
 
         let correctPercentage = Math.floor((correctSum / (unsureSum + wrongSum + correctSum))*100);
-        console.log(correctSum, '/', unsureSum, '+', wrongSum)
         let unsurePercentage = Math.floor((unsureSum / (correctSum + wrongSum + unsureSum))*100); 
         let wrongPercentage = Math.floor((wrongSum / (correctSum + unsureSum + wrongSum))*100); 
         setPercentages([correctPercentage, unsurePercentage, wrongPercentage]);

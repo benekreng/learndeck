@@ -93,7 +93,9 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
-      <Collapsible collapsed={isOpened} duration={400} easing={'easeOutCubic'} style={{padding: 10}}>
+      {/* collapsible does not work on android */}
+
+      {/* <Collapsible collapsed={isOpened} duration={400} easing={'easeOutCubic'} style={{padding: 10}}>
         <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 0}}>
           <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: 50}}>
             <Text style={{color: 'white', fontWeight: 400}}>Choose Study Mode</Text>
@@ -104,8 +106,27 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
           <ButtonElement  name="Reset Stats" style={{marginRight: 5, marginLeft: 5, flex: 1}} onPress={()=> resetStatistics()}/>
           <ButtonElement name="See Stats" style={{marginRight: 5, marginLeft: 5, flex: 1}} onPress={()=> navigation.navigate("StatisticsScreen", { deckName: name, deckStorageId: storageId})}/>
         </View>
-      </Collapsible>
+      </Collapsible> */}
+      { !isOpened ? 
+      (
+        <>
+        <View style={{justifyContent: 'center', alignItems: 'center', paddingTop: 10}}>
+          {/* <View style={{backgroundColor: 'dimgrey', padding: 5, borderRadius: 50}}>
+            <Text style={{color: 'white', fontWeight: 400}}>Choose Study Mode</Text>
+          </View> */}
+        </View>
+        <StudyModeElement studyMode="Study This Deck" deck={name} storageId={storageId}/>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
+          <ButtonElement  name="Reset Stats" style={{marginRight: 5, marginLeft: 5, flex: 1, felxShrink: 0}} onPress={()=> resetStatistics()}/>
+          <ButtonElement name="See Stats" style={{marginRight: 5, marginLeft: 5, flex: 1}} onPress={()=> navigation.navigate("StatisticsScreen", { deckName: name, deckStorageId: storageId})}/>
+        </View>
+        </>
+      ):
+      (
+        <></>
+      )}
     </View>
+
     )
   )
 });
@@ -139,7 +160,6 @@ const CardDecks = () => {
       checkCardDeckNames().then(newNames => {
         if (JSON.stringify(newNames) !== JSON.stringify(prevCardDeckNamesRef.current)) {
           setIsLoaded(false);
-          console.log("Is was not the same")
           refresh();
         }
       });
@@ -168,7 +188,6 @@ const CardDecks = () => {
 
       const numChildren = allStorageKeys.length;
       setCardDeckStorageKeys(allStorageKeys);
-      console.log('use effecr card decks: ', numChildren)
       if (deckBannerRef.current.length !== numChildren) {
         deckBannerRef.current = Array(numChildren).fill().map((_, i) => deckBannerRef.current[i] || React.createRef());
       }
@@ -187,7 +206,6 @@ const CardDecks = () => {
   //force refresh by using a state hook
   const refresh = () => {
     setRefreshHook(prevHook => {
-      console.log("Previous refreshHook:", prevHook);
       return prevHook + 1;
     });
   } 

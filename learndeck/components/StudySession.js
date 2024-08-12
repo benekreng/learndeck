@@ -180,19 +180,16 @@ const StudySession = ({route}) => {
         //When not finished and not flipped show flip button otherwise show feedback button
         !finished ? (
           <View style={{flex: 1, padding: 10}}>
-            <Collapsible collapsed={!isFlipped} duration={400} easing={'easeOutCubic'} >
-              <View style={{flex: 1, flexDirection: 'row'}}>
+            {!isFlipped ? (
+            <ButtonElement name="FLIP" style={{backgroundColor: theme.neutral}} textStyle={{...styles.bigText, color: theme.text02}}onPress={()=> setFlipped(!isFlipped)}/>
+            ):
+            (<View style={{flex: 1, flexDirection: 'row'}}>
                 <ButtonElement name="Wrong" style={{backgroundColor: theme.negative}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
                 <ButtonElement name="Unsure" textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
                 <ButtonElement name="Correct" style={{backgroundColor: theme.positive}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
               </View>
-            </Collapsible>
-            {!isFlipped ? (
-            <ButtonElement name="FLIP" style={{backgroundColor: theme.neutral}} textStyle={{...styles.bigText, color: theme.text02}}onPress={()=> setFlipped(!isFlipped)}/>
-            ):
-            (<></>)}
+            )}
           </View>
-
         ) : (
           //when finished display repeat and finish button
           <View style={{flex: 1, padding: 10, flexDirection: 'row'}}>
