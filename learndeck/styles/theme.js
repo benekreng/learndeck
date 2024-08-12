@@ -11,14 +11,17 @@ const defaultTheme = {
   text02: '#ffffff',
 };
 
+//create context
 export const ThemeContext = createContext({
   theme: defaultTheme,
   updateTheme: () => {},
 });
 
 export function useTheme() {
+  //to avoid errors form fetching user option from async storage the default theme defined at the top is used
   const [theme, setTheme] = useState(defaultTheme);
 
+  //when app launches it loads it loads the user preference from async storage and uses the stored theme
   useEffect(()=> {
     (async () => {
       try{
@@ -36,6 +39,7 @@ export function useTheme() {
     })()
   }, [])
 
+  //method to update theme
   const updateTheme = useCallback((newTheme) => {
     setTheme({
       primary: newTheme[0],

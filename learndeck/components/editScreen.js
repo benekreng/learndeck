@@ -8,16 +8,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 
+//component which shows the front and back side of a flash card next besides each other
 const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJson, frontCardContent, backCardContent, cardNumber, side, additionalStyle, editButtonText="edit"}) => {
 	const { theme, updateTheme } = useContext(ThemeContext);
 	const [editMode, setEditMode] = useState(0);
 
+	//stores new card value
 	const storeNewContent = (text, side) => {
 		deckJson["cards"][cardNumber][side] = text; 
 	}
 
+	//alert to ask user if he is sure if the wants to delete the card
 	const deleteButtonPress = () => {
-		Alert.alert("Are you sure you want to delete this deck", "", [
+		Alert.alert("Are you sure you want to delete this card", "", [
 			{
 				text: 'Cancel',
 				style: 'cancel',
@@ -38,6 +41,7 @@ const BothMiniFlashCards = ({refreshCallback, saveNewCardsToAsncStorage, deckJso
 		refreshCallback();
 	}
 
+	//this handles the press of the edit and save button of one side of a card depending on the cardID passed
 	const editButtonPress = (cardID, action) => {
 		setEditMode(cardID)
 
@@ -124,27 +128,8 @@ const DeleteButton = ({name, callback, cardID, customStyle}) => {
 	)
 }
 
-const EditableMarkdownBox = () => {
-  const [markdownText, setMarkdownText] = useState('');
 
-  return (
-    <PaperProvider theme={MD3LightTheme}>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.textInput}
-          multiline
-          onChangeText={setMarkdownText}
-          value={markdownText}
-          placeholder="Type your markdown here..."
-        />
-        <ScrollView style={styles.markdownContainer}>
-          <Markdown>{markdownText}</Markdown>
-        </ScrollView>
-      </View>
-    </PaperProvider>
-  );
-};
-
+//the edit screen creates a BothMiniFlashCards component for each flashcard there is in the deck
 
 const EditScreen = ({route}) => {
 	const { theme, updateTheme } = useContext(ThemeContext);
@@ -157,28 +142,32 @@ const EditScreen = ({route}) => {
 	const [newName, setNewName] = useState(deck);
 	const [isLoaded, setIsLoaded] = useState(false);
 
+	//updates header style on theme change
   useEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: theme.primary },
     });
   }, [navigation, theme]);
 
+	//this is the logic to change the title name of a deck	
 	const changeName = async () => {
+		//changeName is called every time the user leaves the screen, if the name changed, the name is changed
 		if (newName === deck) {
 			return Promise.resolve("New name is the same as the old name. No change needed.");
 		}
-	
+		
 		const oldKeyName = 'carddeck_' + deck;
 		const newKeyName = 'carddeck_' + newName;
 	
 		try {
 			console.log(newName, "submitted");
 	
+			//if key already exist abort
 			const existingNewDeckJson = await AsyncStorage.getItem(newKeyName);
 			if (existingNewDeckJson !== null) {
 				throw new Error("A deck with the new name already exists.");
 			}
-	
+			//fetches deck from storage and saves it under a new key. The old key gets deleted
 			const existingDeckJson = await AsyncStorage.getItem(oldKeyName);
 			if (existingDeckJson === null) {
 				return Promise.resolve("No existing deck found with the name: " + deck);
@@ -199,7 +188,9 @@ const EditScreen = ({route}) => {
 		}
 	};
 
+	//on load
 	useEffect(() => {
+		//when deck is null then the create new deck function was used
 		if(deck == null){
 			//logic to create a new card deck form scratch if deck is null
 			(async () => {
@@ -216,6 +207,8 @@ const EditScreen = ({route}) => {
 						]
 					}
 					setDeckJson(defaultDeckJson);
+
+					//logic to create a unique title that does not exist already. If untitled1 exist it will call it unitlted2 etc
 					const allKeys = await AsyncStorage.getAllKeys();
 					const untitledList = allKeys.filter(item => item.toLowerCase().includes("untitled"));
 
@@ -223,15 +216,13 @@ const EditScreen = ({route}) => {
 						const match = item.match(/untitled(\d+)/i);
 						return match ? parseInt(match[1]) : null;
 					}).filter(num => num !== null);
-					
 					const highestNumber = numbers.length > 0? Math.max(...numbers) + 1 : 0;
 					const newUntitledName = `untitled${highestNumber}`;
 					const newUntitledStorageKey = `carddeck_${newUntitledName}`;
+
 					setDeck(newUntitledName);
 					setNewName(newUntitledName);
 					setDeckStorageID(newUntitledStorageKey);
-					console.log(newUntitledStorageKey);
-					console.log(newUntitledName);
 					if(typeof newUntitledStorageKey !== "string"){
 						console.log("newUntitledStorageKey is not a string", newUntitledStorageKey)
 						return
@@ -246,6 +237,7 @@ const EditScreen = ({route}) => {
 					return;
 			})();
 		}else{
+			//if deck is not null then the user wants to edit the deck. Loading it in here
 			(async () => {
 				try {
 					const deckAsJson = await AsyncStorage.getItem(deckStorageId); 
@@ -259,7 +251,7 @@ const EditScreen = ({route}) => {
 		}
   }, []);
 
-
+	//save new card to async storage
 	const saveNewCardsToAsncStorage = async (newJson) => {
 			try{
 				const serializedJson = JSON.stringify(newJson);
@@ -270,10 +262,12 @@ const EditScreen = ({route}) => {
 			}
 	}
 
+	//force refresh
 	const refresh = () => {
 		setRefreshProp(refreshProp + 1);
 	}
 	
+	//and a new card and save card deck object to async storage
 	const addNewCard = async () => {
 		const newCard = {
 			"front": "Edit Front",

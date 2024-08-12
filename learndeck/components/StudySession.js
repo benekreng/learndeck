@@ -7,17 +7,16 @@ import Collapsible from 'react-native-collapsible';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Markdown from 'react-native-markdown-display';
 
-
 import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 
+//study session steps through the whole card deck to 
 const StudySession = ({route}) => {
   const { theme, updateTheme } = useContext(ThemeContext);
   //load from storage to memory to read and write the statistics
   const { deck, studyMode, storageId} = route.params;
   const navigation = useNavigation();
-
   const [isFlipped, setFlipped] = useState(false);
   const [currentCard, setNextCard] = useState(0);
   const [lastCard, setLastCard] = useState(0);
@@ -25,12 +24,14 @@ const StudySession = ({route}) => {
   const [finished, setFinished] = useState(false);
   const [sessionScore, setSessionScore] = useState([0, 0, 0]);
 
+  //on theme change change header style
   useEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: theme.primary },
     });
   }, [navigation, theme]);
 
+  //load in the card decks, if there arent any decks then prompt the user and go back
   useEffect(() => {
     (async () => {
       try {
@@ -55,22 +56,23 @@ const StudySession = ({route}) => {
     })();
   }, []);
 
-  //when deckjson is set than 
+  //when deckjson is set then 
   useEffect(() => {
     if(deckJson){
       reloadStudySession();
     }
-    
   }, [deckJson])
 
+  //Wheen the user clicks repeat at the end of a study reload study session
   const reloadStudySession = () => {
     setFlipped(false);
     setFinished(false);
+    //adding new statistics array
     deckJson['statistics']['errorsPerRun'].push([0,0,0]);
   }
 
+  //handle feedback and append to the statistics array
   const handleFeedback = (feedback) => {
-    
     try{
       if(feedback == 'Wrong'){
         deckJson['cards'][currentCard]['statistics'][0] += 1
@@ -94,13 +96,14 @@ const StudySession = ({route}) => {
       console.log("Could not set feedback for this card or update statistics for this session", err)
     }
 
+    //if it was not the last card return early to move on to the next card
     if(currentCard < lastCard){
       setNextCard(currentCard + 1);
       setFlipped(false);
       return;
     }
 
-    //after feedback for last card was given
+    //after feedback for last card was given store the data and set finish flag true to show the finish screen
     setFinished(true);
     setNextCard(currentCard + 1);
     setSessionScore(deckJson['statistics']['errorsPerRun'][deckJson['statistics']['errorsPerRun'].length-1]);
@@ -122,13 +125,14 @@ const StudySession = ({route}) => {
   return (
     <SafeAreaView style={{backgroundColor: theme.primary, flex: 1, justifyContent: 'flex-end'}}>
       <View style={{flex: 9}}>
-        <View style={{flex: 0.8, justifyContent: 'center'}}>
+        <View style={{flex: 0.8, justifyContent: 'center', marginLeft: 5, marginRight:5}}>
           <Text numberOfLines={1} adjustsFontSizeToFit style={{fontSize: 30, fontWeight: 'bold', textAlign: 'center', alignSelf: 'center'}}>{route.params.deck}</Text>
         </View>
         <View style={{flex: 0.3}}>
           <ProgressBar currentCard={currentCard} lastCard={lastCard} />
         </View>
         {
+          //study mode which cycles thorugh all the flashcards
           !finished ? (
             <>
             <TouchableOpacity style={{flex: 2.5}} onPress={() => setFlipped(!isFlipped)}>
@@ -145,6 +149,7 @@ const StudySession = ({route}) => {
             </View>
             </>
           ) : (
+            //finnish screen gets displayed when study is finished
             <>
             <View style={{flex: 0.7, justifyContent: 'center'}}>
               <Text numberOfLines={1} adjustsFontSizeToFit style={{fontSize: 24, fontWeight: 'bold', textAlign: 'center', alignSelf: 'center'}}>Statistics</Text>
@@ -171,12 +176,13 @@ const StudySession = ({route}) => {
           }
         </View>
         {
-          //to displayed when not training, not finished
+        //bottom part of the screen
+        //When not finished and not flipped show flip button otherwise show feedback button
         !finished ? (
           <View style={{flex: 1, padding: 10}}>
             <Collapsible collapsed={!isFlipped} duration={400} easing={'easeOutCubic'} >
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <ButtonElement name="Wrong" style={{backgroundColor: theme.negative, flex: 1}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
+                <ButtonElement name="Wrong" style={{backgroundColor: theme.negative}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
                 <ButtonElement name="Unsure" textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
                 <ButtonElement name="Correct" style={{backgroundColor: theme.positive}} textStyle={{...styles.midText01}} handleFeedback={handleFeedback}/>
               </View>
@@ -188,6 +194,7 @@ const StudySession = ({route}) => {
           </View>
 
         ) : (
+          //when finished display repeat and finish button
           <View style={{flex: 1, padding: 10, flexDirection: 'row'}}>
             <ButtonElement name="Repeat" style={{...styles.transition, backgroundColor: theme.negative}} textStyle={{...styles.bigText}}onPress={()=> {setNextCard(0);reloadStudySession()}}/>
             <ButtonElement name="Finish" style={{...styles.transition, backgroundColor: theme.positive}} textStyle={{...styles.bigText}}onPress={()=> navigation.goBack()}/>
@@ -198,6 +205,7 @@ const StudySession = ({route}) => {
     )
 }
 
+//this component is the progressbar which shows how far along the deck the user is
 const ProgressBar = ({currentCard, lastCard}) => {
   const { theme, updateTheme } = useContext(ThemeContext);
   const [greenPart, setGreenPart] = useState(0);
@@ -224,8 +232,8 @@ const ProgressBar = ({currentCard, lastCard}) => {
   )
 }
 
+//component that renders a flashcard, with markdown inside
 const FlashCard = ({ deckJson, cardNumber, side}) => {
-  const { theme, updateTheme } = useContext(ThemeContext);
   return (
     <View style={{ ...styles.flashcardView }}>
       <View style={styles.flashcardInnerView}>
@@ -237,7 +245,7 @@ const FlashCard = ({ deckJson, cardNumber, side}) => {
   );
 };
 
-
+//all statics component to render when user finishes
 const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
   const { theme, updateTheme } = useContext(ThemeContext);
   const errorsPerRun = perRunStatisticsArray?.['statistics']?.['errorsPerRun'] ?? [];
@@ -262,26 +270,5 @@ const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
     </>
   )
 }
-
-// const FlashCard = ({ deckJson, cardNumber, side}) => {
-//   const [cardContent, setCardContent] = useState('');
-
-//   useEffect(() => {
-//     if(deckJson['cards'] == undefined){
-//       return;
-//     }
-//     setCardContent(deckJson['cards'][cardNumber][side])
-//   },[deckJson, cardNumber])
-
-//   return (
-//     <View style={{ ...styles.flashcardView }}>
-//       <View style={styles.flashcardInnerView}>
-//         <View style={styles.flashcardTextView}>
-//           <Text>{cardContent}</Text>
-//         </View>
-//       </View>
-//     </View>
-//   );
-// };
 
 export default StudySession;

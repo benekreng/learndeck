@@ -17,23 +17,24 @@ const StatisticsScreen = ({route}) => {
   const [percentages, setPercentages] = useState([0, 0, 0]);
   const navigation = useNavigation();
 
-
   useEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: theme.primary },
     });
   }, [navigation, theme]);
 
+
+  //loads the according deck from storage and makes calculations to create graph and percentage
   useEffect(() => {
     (async () => {
       try {
-        console.log("this is the storage id right??", deckStorageId);
         const deckAsJson = await AsyncStorage.getItem(deckStorageId); 
         const deckParsed = await JSON.parse(deckAsJson);
         console.log('this json has been fetched from the database ', deckAsJson)
         const lastCardIndex = deckParsed['statistics']['errorsPerRun'].length;
         setDeckJson(deckParsed);
 
+        //calculating the percentage of wrong, unsure and correct guesses
         let correctSum = 0;
         let unsureSum = 0;
         let wrongSum = 0;
@@ -52,6 +53,7 @@ const StatisticsScreen = ({route}) => {
         let wrongPercentage = Math.floor((wrongSum / (correctSum + unsureSum + wrongSum))*100); 
         setPercentages([correctPercentage, unsurePercentage, wrongPercentage]);
 
+        //if the user has not studies the deck at least once prompt the user to navigate back
         if(lastCardIndex == 0){
           Alert.alert("You have to absolve at least one study to see statistics", "", [
             {
@@ -92,6 +94,7 @@ const StatisticsScreen = ({route}) => {
   ) }
 
 
+//graph component to draw all past statistics
 const AllStatisticsGraph = ({perRunStatisticsArray, currentCard=0}) => {
   const { theme, updateTheme } = useContext(ThemeContext);
   const errorsPerRun = perRunStatisticsArray?.['statistics']?.['errorsPerRun'] ?? [];

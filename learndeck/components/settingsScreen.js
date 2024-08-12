@@ -20,6 +20,7 @@ const CommunityDecks = ({route}) => {
     });
   }, [navigation, theme]);
 
+  //load settings object from storage
   useEffect(() => {
     (async () => {
       try {
@@ -34,11 +35,13 @@ const CommunityDecks = ({route}) => {
     })();
   }, []);
 
+  //when user selects theme, updates the async storage and calls the updateTheme method from useContext 
   const changeColorTheme = async (id) => {
     await AsyncStorage.setItem('selectedColorTheme', String(id)); 
     updateTheme(settingJson["colorthemes"][id]);
   }
 
+  //Double alert, double confirmation to really make sure the user wants to delete all data
   const resetToFactorySettings = () => {
     Alert.alert("Are you sure you want to reset to factory settings?", "", [
       {
@@ -93,6 +96,7 @@ const CommunityDecks = ({route}) => {
   )
 }
 
+//component that previews the different color themes
 const ColorThemePreview = ({colors, id, changeColorTheme}) => {
   return(
     <View style={{width: '100%', margin: 10}}>
@@ -107,7 +111,5 @@ const ColorThemePreview = ({colors, id, changeColorTheme}) => {
     </View>
   )
 }
-
-
 
 export default CommunityDecks;

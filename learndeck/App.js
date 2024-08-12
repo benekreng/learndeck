@@ -43,6 +43,7 @@ export default function App() {
         console.log("All the keys that where in async storage: ", keys);
         if(storedData == null){
           try{
+            //signify that app has been loaded once
             await AsyncStorage.setItem("appWasLaunchedOnce", "this key signified that the app has been already launched once");
             for await (const [key, value] of Object.entries(DefaultCardDecksCollection)){
               console.log('first launch')
@@ -74,7 +75,6 @@ export default function App() {
       setIsLoading(false)
     })();
   }, []);
-
 
   return (
     isLoading ? (<></>) : 

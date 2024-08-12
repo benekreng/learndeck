@@ -11,19 +11,20 @@ const SettingsScreen = ({route}) => {
   //load from storage to memory to read and write the statistics
   const { theme, updateTheme } = useContext(ThemeContext);
   const [ apiCarddecks, setApiCarddecks] = useState([]);
-  // const { deckName, deckStorageId} = route.params;
   const [settingJson, setSettingJson] = useState();
   const [isLoaded, setIsLoaded] = useState(false);
   const navigation = useNavigation();
   // const apiBaseUrl = 'http://localhost:3000/'
   const apiBaseUrl = 'http://194.164.197.201:45659/'
 
+  //updates the header style of the stack navigator
   useEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: theme.primary },
     });
   }, [navigation, theme]);
 
+  //makes a get request to fetch all community decks from the server
   useEffect(() => {
     fetch(apiBaseUrl + 'carddecks/brief')
     .then(response => response.json())
@@ -34,6 +35,8 @@ const SettingsScreen = ({route}) => {
     .catch(error => console.error(error));
   }, []);
 
+  //adds the carddeck to the library by its id
+  //route: carddecks/<int>
   const addToLibrary = async (id) => {
     try {
       const response = await fetch(apiBaseUrl + 'carddecks/' + String(id));
@@ -44,7 +47,7 @@ const SettingsScreen = ({route}) => {
     }
   }
 
-  if(!isLoaded) return <View style={{backgroundColor: theme.primary, flex: 1}}></View>
+  if(!isLoaded) return <View style={{backgroundColor: theme.primary, flex: 1}}><Text>Loading...</Text></View>
   return (
     <ScrollView style={{backgroundColor: theme.primary}}>
     <View style={{backgroundColor: theme.primary, justifyContent: 'flex-start'}}>
@@ -67,7 +70,6 @@ const SettingsScreen = ({route}) => {
     </ScrollView>
   )
 }
-
 
 
 export default SettingsScreen;

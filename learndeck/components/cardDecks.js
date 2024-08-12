@@ -10,15 +10,18 @@ import ButtonElement from './buttonElement'
 import styles from '../styles/mainStyles'
 import { ThemeContext } from '../styles/theme';
 
+//ui element for one card deck
 const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}, ref) => {
   const { theme, updateTheme } = useContext(ThemeContext);
   const navigation = useNavigation();
   const [isOpened, setOpened] = useState(true);
 
+  //imerative so the parent can call changeLocalCollapse method trigger collapse
   useImperativeHandle(ref, () => ({
     changeLocalCollapseState
   }));
 
+  //changes local collapse state
   const changeLocalCollapseState = (deck) => {
     if(deck == name){
       setOpened(!isOpened)
@@ -27,6 +30,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
     setOpened(true)
   }
 
+  //this resets the statistics by loading the data of the deck, reseting the array storing the deck again
   const resetStatistics = () => {
      Alert.alert("Are you sure you want to reset the statistics?", "", [
       {
@@ -46,6 +50,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
     ])
   }
 
+  //deletes deck
   const deleteDeck = async () => {
     Alert.alert("Are you sure you want to delete this deck?", "", [
       {
@@ -78,7 +83,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
     (
       <View style={styles.bannerOuterView}>
       <TouchableOpacity style={{...styles.banner, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} onPress={(event) => pressed(event, name)}>
-        <Text numberOfLines={2}  style={{...styles.bigText, alignSelf: 'center', flex: 1}}>{name}</Text>
+        <Text numberOfLines={2} adjustsFontSizeToFit style={{...styles.bigText, alignSelf: 'center', flex: 1, marginRight: 5}}>{name}</Text>
         <View style={{flexDirection: 'column'}}>
           <TouchableOpacity style={{backgroundColor: 'darkgrey', padding: 5, marginBottom: 8, borderWidth: 2}} onPress={() => deleteDeck()} >
             <Text>Delete</Text>
@@ -95,12 +100,8 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
           </View>
         </View>
         <StudyModeElement studyMode="Study This Deck" deck={name} storageId={storageId}/>
-        {/* <StudyModeElement studyMode="Study Weaknesses" deck={name} storageId={storageId}/> */}
-        {/* <StudyModeElement studyMode="Study Mixed" deck={name} storageId={storageId}/>
-        <StudyModeElement studyMode="Study Comprehensive" deck={name} storageId={storageId}/> */}
         <View style={{flexDirection: 'row', justifyContent: 'space-between', margin: 10}}>
-          <ButtonElement  name="Reset Stats" style={{marginRight: 5, marginLeft: 5}} onPress={()=> resetStatistics()}/>
-          {/* <ButtonElement  name="Archive" style={{marginRight: 5, marginLeft: 5}}/> */}
+          <ButtonElement  name="Reset Stats" style={{marginRight: 5, marginLeft: 5, flex: 1}} onPress={()=> resetStatistics()}/>
           <ButtonElement name="See Stats" style={{marginRight: 5, marginLeft: 5, flex: 1}} onPress={()=> navigation.navigate("StatisticsScreen", { deckName: name, deckStorageId: storageId})}/>
         </View>
       </Collapsible>
@@ -109,7 +110,7 @@ const CardDeckBannerCell = forwardRef(({name, storageId, pressed, refreshParent}
   )
 });
 
-
+//this is the comonent of the "card deck" stack screen which shows your collection of card decks
 const CardDecks = () => {
   const { theme, updateTheme } = useContext(ThemeContext);
   const navigation = useNavigation();
@@ -145,6 +146,7 @@ const CardDecks = () => {
     }, [])
   );
 
+  //returns an array of the card deck names, if non are there it returns an empty array
   const checkCardDeckNames = async () => {
     const rawKeys = await AsyncStorage.getAllKeys();
     const carddeckPrefix = 'carddeck_';
@@ -155,6 +157,7 @@ const CardDecks = () => {
 
   useEffect(() => {
     (async () => {
+      //retrieves card decks from storage and passes callback functions to carddeckbannercells
       const rawKeys = await AsyncStorage.getAllKeys();
       const carddeckPrefix = 'carddeck_';
       const allStorageKeys = rawKeys.filter(key => key.startsWith(carddeckPrefix));
@@ -174,12 +177,14 @@ const CardDecks = () => {
   },[refreshHook])
 
   
+  //called by the carddeckbannercell component if it has been clicked on/collapsed
   const handleCollapse = (event, deck) => {
     deckBannerRef.current.forEach(ref => {
         ref.current.changeLocalCollapseState(deck);
     });
-    //scrollViewRef.current?.scrollToEnd({ animated: true });
   }
+
+  //force refresh by using a state hook
   const refresh = () => {
     setRefreshHook(prevHook => {
       console.log("Previous refreshHook:", prevHook);
@@ -193,8 +198,6 @@ const CardDecks = () => {
     <ScrollView key={refreshHook} ref={scrollViewRef} style={{backgroundColor: theme.primary, position: 'relative'}}>
       <View style={{padding: 5}}></View>
         {cardDeckNames.map((key, idx) => {
-          console.log("this should be the an object", key)
-
          return(<CardDeckBannerCell key={key} name={key} storageId={cardDeckStorageKeys[idx]} pressed={handleCollapse} ref={deckBannerRef.current[idx]} refreshParent={refresh}/>)
         }
         )}
@@ -231,22 +234,7 @@ const CardDecks = () => {
   )
 }
 
-const MyScrollView = () => {
-  const scrollViewRef = React.createRef();
-
-  const handleElementPress = (index) => {
-    const element = scrollViewRef.current.props.children[index];
-    scrollToElement(scrollViewRef.current, element);
-  };
-
-  return (
-    <ScrollView ref={scrollViewRef}>
-      {/* your elements here */}
-    </ScrollView>
-  );
-};
-
-//elment to click on to select study mode
+//elment to click on to enter study mode
 const StudyModeElement = ({studyMode, deck, storageId}) => {
   const navigation = useNavigation();
   return (

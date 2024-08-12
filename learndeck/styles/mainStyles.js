@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-import { theme } from '../styles/theme.js';
 
 const styleElements = StyleSheet.create({
   borderAndShadow: {
